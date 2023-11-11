@@ -4,7 +4,7 @@ LDFLAGS =
 SRC_DIR = src
 OBJ_DIR = obj
 BIN_DIR = bin
-SOURCES = $(wildcard $(SRC_DIR)/*.cpp)
+SOURCES = $(wildcard $(SRC_DIR)/**/*.cpp $(SRC_DIR)/*.cpp)
 OBJECTS = $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SOURCES))
 EXECUTABLE = $(BIN_DIR)/Vim
 
@@ -17,8 +17,8 @@ $(EXECUTABLE): $(OBJECTS)
 	$(CXX) $(LDFLAGS) -o $@ $^
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
-	@mkdir -p $(OBJ_DIR)
+	@mkdir -p $(dir $@)
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 clean:
-	rm -rf $(OBJ_DIR)
+	rm -rf $(OBJ_DIR) $(BIN_DIR)
