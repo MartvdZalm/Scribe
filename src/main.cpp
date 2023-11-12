@@ -9,6 +9,8 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <algorithm>
+#include <cctype>
 
 #include <Editor/Config.h>
 #include <Editor/Key.h>
@@ -148,11 +150,16 @@ void editorOpen(char *filename)
 
     std::string line;
 
-    if (std::getline(file, line)) {
-        config.getRow().setSize(line.length());
-        config.getRow().setChars(line);
-        config.setNumRows(1);
+    while (std::getline(file, line)) {
+
+    	line.erase(std::find_if(line.rbegin(), line.rend(), [](int ch) {
+        	return !std::isspace(ch);
+    	}).base(), line.end());
+
+    	config.addRow(line.length(), line);
     }
+
+    file.close();
 }
 
 void editorDrawRows(std::string *ab)
@@ -179,7 +186,7 @@ void editorDrawRows(std::string *ab)
 			}
 
 		} else {
-			ab->append(config.getRow().getChars());
+			ab->append(config.getRowAt(y).getChars());
 		}
 
 		ab->append("\x1b[K");
