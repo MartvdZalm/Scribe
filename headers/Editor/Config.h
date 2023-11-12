@@ -1,6 +1,7 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+#include <vector>
 #include <termios.h>
 #include <Editor/Row.h>
 
@@ -11,8 +12,7 @@ private:
     int coordinateY;
     int screenRows;
     int screenCols;
-    int numRows;
-    Row row;
+    std::vector<Row> rows;
     termios origTermios;
 
 public:
@@ -34,11 +34,13 @@ public:
 
     void setCoordinateY(int y);
 
-    int& getNumRows();
+    int getNumRows();
 
-    void setNumRows(int numRows);
+    std::vector<Row>& getRows();
 
-    Row& getRow();
+    Row& getRowAt(int index);
+
+    void addRow(int size, std::string chars);
 };
 
 #endif
