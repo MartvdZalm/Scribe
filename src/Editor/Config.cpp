@@ -2,10 +2,9 @@
 
 Config::Config() : 
 coordinateX(0), 
-coordinateY(0), 
-numRows(0),
-origTermios(),
-row() {}
+coordinateY(0),
+rows(),
+origTermios() {}
 
 Config::~Config() {}
 
@@ -44,17 +43,25 @@ void Config::setCoordinateY(int y)
 	coordinateY = y;
 }
 
-int& Config::getNumRows()
+int Config::getNumRows()
 {
-	return numRows;
+	return rows.size();
 }
 
-void Config::setNumRows(int numRows)
+std::vector<Row>& Config::getRows()
 {
-	this->numRows = numRows;
+	return rows;
 }
 
-Row& Config::getRow()
+Row& Config::getRowAt(int index)
 {
-	return row;
+	return rows.at(index);
+}
+
+void Config::addRow(int size, std::string chars)
+{
+	Row row;
+	row.setSize(size);
+	row.setChars(chars);
+	rows.push_back(row);
 }
