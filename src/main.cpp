@@ -43,8 +43,8 @@ void enableRawMode()
 
   	termios raw = config.getOrigTermios();
   	raw.c_iflag &= ~(BRKINT | ICRNL | INPCK | ISTRIP | IXON);
-  	raw.c_iflag &= ~(OPOST);
-  	raw.c_iflag |= ~(CS8);
+  	raw.c_oflag &= ~(OPOST);
+  	raw.c_cflag |= ~(CS8);
   	raw.c_lflag &= ~(ECHO | ICANON | IEXTEN | ISIG);
   	raw.c_cc[VMIN] = 0;
   	raw.c_cc[VTIME] = 1;
