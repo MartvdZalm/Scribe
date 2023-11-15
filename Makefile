@@ -6,7 +6,7 @@ OBJ_DIR = obj
 BIN_DIR = bin
 SOURCES = $(wildcard $(SRC_DIR)/**/*.cpp $(SRC_DIR)/*.cpp)
 OBJECTS = $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SOURCES))
-EXECUTABLE = $(BIN_DIR)/Vim
+EXECUTABLE = $(BIN_DIR)/Scribe
 
 .PHONY: all clean
 
