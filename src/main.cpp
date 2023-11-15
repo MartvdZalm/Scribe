@@ -247,12 +247,18 @@ void editorMoveCursor(int key)
 	case ARROW_LEFT:
 		if (config.getCoordinateX() != 0) {
 			config.setCoordinateX(config.getCoordinateX() - 1);
+		} else if (config.getCoordinateY() > 0) {
+			config.setCoordinateY(config.getCoordinateY() - 1);
+			config.setCoordinateX(config.getRowAt(config.getCoordinateY()).getSize());
 		}
 		break;
 
 	case ARROW_RIGHT:
 		if (row && config.getCoordinateX() < row->getSize()) {
 			config.setCoordinateX(config.getCoordinateX() + 1);
+		} else if (row && config.getCoordinateX() == row->getSize()) {
+			config.setCoordinateY(config.getCoordinateY() + 1);
+			config.setCoordinateX(0);
 		}
 		break;
 
@@ -267,6 +273,13 @@ void editorMoveCursor(int key)
 			config.setCoordinateY(config.getCoordinateY() + 1);
 		}
 		break;
+	}
+
+	row = (config.getCoordinateY() >= config.getNumRows()) ? NULL : &config.getRowAt(config.getCoordinateY());
+	int rowLen = row ? row->getSize() : 0;
+
+	if (config.getCoordinateX() > rowLen) {
+		config.setCoordinateX(rowLen);
 	}
 }
 
