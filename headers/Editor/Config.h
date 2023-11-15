@@ -10,6 +10,8 @@ class Config
 private:
     int coordinateX;
     int coordinateY;
+    int rowOff;
+    int colOff;
     int screenRows;
     int screenCols;
     std::vector<Row> rows;
@@ -33,6 +35,14 @@ public:
     void setCoordinateX(int x);
 
     void setCoordinateY(int y);
+
+    int& getRowOff();
+
+    void setRowOff(int off);
+
+    int& getColOff();
+
+    void setColOff(int off);
 
     int getNumRows();
 

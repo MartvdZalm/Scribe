@@ -162,12 +162,33 @@ void editorOpen(char *filename)
     file.close();
 }
 
+void editorScroll()
+{
+	if (config.getCoordinateY() < config.getRowOff()) {
+		config.setRowOff(config.getCoordinateY());
+	}
+
+	if (config.getCoordinateY() >= config.getRowOff() + config.getScreenRows()) {
+		config.setRowOff(config.getCoordinateY() - config.getScreenRows() + 1);
+	}
+
+	if (config.getCoordinateX() < config.getColOff()) {
+		config.setColOff(config.getCoordinateX());
+	}
+
+	if (config.getCoordinateX() >= config.getColOff() + config.getScreenCols()) {
+		config.setColOff(config.getCoordinateX() - config.getScreenCols() + 1);
+	}
+}
+
 void editorDrawRows(std::string *ab)
 {
 	int y;
 	for (y = 0; y < config.getScreenRows(); y++) {
 
-		if (y >= config.getNumRows()) {
+		int fileRow = y + config.getRowOff();
+
+		if (fileRow >= config.getNumRows()) {
 
 			if (config.getNumRows() == 0 && y == config.getScreenRows() / 3) {
 				std::string greeting = "Scribe Editor -- version " + std::string(SCRIBE_VERSION);
@@ -186,7 +207,10 @@ void editorDrawRows(std::string *ab)
 			}
 
 		} else {
-			ab->append(config.getRowAt(y).getChars());
+			int len = config.getRowAt(fileRow).getSize() - config.getColOff();
+			if (len < 0) len = 0;
+			if (len > config.getScreenCols()) len = config.getScreenCols();
+			ab->append(config.getRowAt(fileRow).getChars().substr(config.getColOff(), len));
 		}
 
 		ab->append("\x1b[K");
@@ -198,6 +222,8 @@ void editorDrawRows(std::string *ab)
 
 void editorRefreshScreen()
 {
+	editorScroll();
+
 	std::string ab;
 
 	ab.append("\x1b[?25l");
@@ -205,7 +231,7 @@ void editorRefreshScreen()
 
 	editorDrawRows(&ab);
 
-	ab.append("\x1b[" + std::to_string(config.getCoordinateY() + 1) + ";" + std::to_string(config.getCoordinateX() + 1) + "H");
+	ab.append("\x1b[" + std::to_string((config.getCoordinateY() - config.getRowOff()) + 1) + ";" + std::to_string((config.getCoordinateX() - config.getColOff()) + 1) + "H");
 
 	ab.append("\x1b[?25h");
 
@@ -214,6 +240,8 @@ void editorRefreshScreen()
 
 void editorMoveCursor(int key)
 {
+	Row *row = (config.getCoordinateY() >= config.getNumRows()) ? NULL : &config.getRowAt(config.getCoordinateY());
+
 	switch (key) {
 
 	case ARROW_LEFT:
@@ -223,7 +251,7 @@ void editorMoveCursor(int key)
 		break;
 
 	case ARROW_RIGHT:
-		if (config.getCoordinateX() != config.getScreenCols() - 1) {
+		if (row && config.getCoordinateX() < row->getSize()) {
 			config.setCoordinateX(config.getCoordinateX() + 1);
 		}
 		break;
@@ -235,7 +263,7 @@ void editorMoveCursor(int key)
 		break;
 
 	case ARROW_DOWN:
-		if (config.getCoordinateY() != config.getScreenRows() - 1) {
+		if (config.getCoordinateY() < config.getNumRows()) {
 			config.setCoordinateY(config.getCoordinateY() + 1);
 		}
 		break;

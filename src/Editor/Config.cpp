@@ -3,6 +3,8 @@
 Config::Config() : 
 coordinateX(0), 
 coordinateY(0),
+rowOff(0),
+colOff(0),
 rows(),
 origTermios() {}
 
@@ -41,6 +43,26 @@ void Config::setCoordinateX(int x)
 void Config::setCoordinateY(int y)
 {
 	coordinateY = y;
+}
+
+int& Config::getRowOff()
+{
+	return rowOff;
+}
+
+void Config::setRowOff(int off)
+{
+	rowOff = off;
+}
+
+int& Config::getColOff()
+{
+	return colOff;
+}
+
+void Config::setColOff(int off)
+{
+	colOff = off;
 }
 
 int Config::getNumRows()
