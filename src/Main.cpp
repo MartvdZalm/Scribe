@@ -153,6 +153,11 @@ void editorOpen(char *filename)
 
     std::string line;
     while (std::getline(file, line)) {
+
+    	line.erase(std::find_if(line.rbegin(), line.rend(), [](int ch) {
+        	return !std::isspace(ch);
+    	}).base(), line.end());
+
     	config.addRow(line);
     }
 

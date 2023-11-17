@@ -6,7 +6,7 @@ Row::~Row() {}
 
 int Row::getSize()
 {
-    int rowSize = 0;
+	int rowSize = 0;
 
     for (char c : str) {
 
