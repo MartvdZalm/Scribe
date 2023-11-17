@@ -17,6 +17,8 @@
 #include <Editor/Row.h>
 
 #define SCRIBE_VERSION "0.0.1"
+#define SCRIBE_TAB_STOP 4
+
 #define CTRL_KEY(k) ((k) & 0x1f)
 
 Config config = Config();
@@ -107,11 +109,6 @@ int editorReadKey()
 	}
 }
 
-void editorUpdateRow(Row *row)
-{
-	row->setRender(row->getChars());
-}
-
 int getCursorPosition(int *rows, int *cols)
 {
 	char buf[32];
@@ -150,17 +147,12 @@ void editorOpen(char *filename)
 {
 	std::ifstream file(filename);
 
-	if (!file.is_open())
+	if (!file.is_open()) {
         throw std::runtime_error("Failed to open file");
+	}
 
     std::string line;
-
     while (std::getline(file, line)) {
-
-    	line.erase(std::find_if(line.rbegin(), line.rend(), [](int ch) {
-        	return !std::isspace(ch);
-    	}).base(), line.end());
-
     	config.addRow(line);
     }
 
@@ -188,14 +180,13 @@ void editorScroll()
 
 void editorDrawRows(std::string *ab)
 {
-	int y;
-	for (y = 0; y < config.getScreenRows(); y++) {
+	for (int i = 0; i < config.getScreenRows(); i++) {
 
-		int fileRow = y + config.getRowOff();
+		int fileRow = i + config.getRowOff();
 
 		if (fileRow >= config.getNumRows()) {
 
-			if (config.getNumRows() == 0 && y == config.getScreenRows() / 3) {
+			if (config.getNumRows() == 0 && i == config.getScreenRows() / 3) {
 				std::string greeting = "Scribe Editor -- version " + std::string(SCRIBE_VERSION);
 
 				int padding = (config.getScreenCols() - greeting.length()) / 2;
@@ -215,11 +206,11 @@ void editorDrawRows(std::string *ab)
 			int len = config.getRowAt(fileRow).getSize() - config.getColOff();
 			if (len < 0) len = 0;
 			if (len > config.getScreenCols()) len = config.getScreenCols();
-			ab->append(config.getRowAt(fileRow).getChars().substr(config.getColOff(), len));
+			ab->append(config.getRowAt(fileRow).getString().substr(config.getColOff(), len));
 		}
 
 		ab->append("\x1b[K");
-		if (y < config.getScreenRows() - 1) {
+		if (i < config.getScreenRows() - 1) {
 			ab->append("\r\n");
 		}
 	}
