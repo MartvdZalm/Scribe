@@ -1,13 +1,17 @@
 #include "Editor/Row.h"
 
-int& Row::getSize()
+Row::Row() {}
+
+Row::~Row() {}
+
+int Row::getSize()
 {
-	return size;
+	return static_cast<int>(chars.length());
 }
 
-void Row::setSize(int s)
+int Row::getRenderSize()
 {
-	size = s;
+	return static_cast<int>(render.length());
 }
 
 std::string& Row::getChars()
@@ -15,7 +19,17 @@ std::string& Row::getChars()
 	return chars;
 }
 
-void Row::setChars(std::string c)
+void Row::setChars(std::string chars)
 {
-	chars = c;
+	this->chars = chars;
+}
+
+std::string& Row::getRender()
+{
+	return render;
+}
+
+void Row::setRender(std::string render)
+{
+	this->render = render; 
 }
