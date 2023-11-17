@@ -80,9 +80,9 @@ Row& Config::getRowAt(int index)
 	return rows.at(index);
 }
 
-void Config::addRow(std::string chars)
+void Config::addRow(std::string str)
 {
 	Row row;
-	row.setChars(chars);
+	row.setString(str);
 	rows.push_back(row);
 }
