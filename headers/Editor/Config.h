@@ -50,7 +50,7 @@ public:
 
     Row& getRowAt(int index);
 
-    void addRow(std::string chars);
+    void addRow(std::string str);
 };
 
 #endif
