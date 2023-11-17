@@ -6,30 +6,26 @@ Row::~Row() {}
 
 int Row::getSize()
 {
-	return static_cast<int>(chars.length());
+    int rowSize = 0;
+
+    for (char c : str) {
+
+        if (c == '\t') {
+            rowSize += (8 - (rowSize % 8));
+        } else {
+            rowSize++;
+        }
+    }
+
+    return rowSize;
 }
 
-int Row::getRenderSize()
+std::string& Row::getString()
 {
-	return static_cast<int>(render.length());
+	return str;
 }
 
-std::string& Row::getChars()
+void Row::setString(std::string str)
 {
-	return chars;
-}
-
-void Row::setChars(std::string chars)
-{
-	this->chars = chars;
-}
-
-std::string& Row::getRender()
-{
-	return render;
-}
-
-void Row::setRender(std::string render)
-{
-	this->render = render; 
+	this->str = str;
 }
