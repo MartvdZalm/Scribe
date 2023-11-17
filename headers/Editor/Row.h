@@ -6,17 +6,25 @@
 class Row
 {
 private:
-	int size;
 	std::string chars;
+	std::string render;
 
 public:
-	int& getSize();
+	Row();
 
-	void setSize(int size);
+	~Row();
+
+	int getSize();
+
+	int getRenderSize();
 
 	std::string& getChars();
 
 	void setChars(std::string chars);
+
+	std::string& getRender();
+
+	void setRender(std::string render);
 
 };
 
