@@ -107,6 +107,11 @@ int editorReadKey()
 	}
 }
 
+void editorUpdateRow(Row *row)
+{
+	row->setRender(row->getChars());
+}
+
 int getCursorPosition(int *rows, int *cols)
 {
 	char buf[32];
@@ -156,7 +161,7 @@ void editorOpen(char *filename)
         	return !std::isspace(ch);
     	}).base(), line.end());
 
-    	config.addRow(line.length(), line);
+    	config.addRow(line);
     }
 
     file.close();
