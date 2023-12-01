@@ -145,6 +145,8 @@ int getWindowSize(int *rows, int *cols)
 
 void editorOpen(char *filename)
 {
+	config.setFilename(filename);
+
 	std::ifstream file(filename);
 
 	if (!file.is_open()) {
@@ -215,10 +217,24 @@ void editorDrawRows(std::string *ab)
 		}
 
 		ab->append("\x1b[K");
-		if (i < config.getScreenRows() - 1) {
-			ab->append("\r\n");
-		}
+		ab->append("\r\n");
 	}
+}
+
+void editorDrawStatusBar(std::string *ab)
+{
+	ab->append("\x1b[7m");
+
+	std::string status = config.getFilename().substr(0, 20) + " - " +  std::to_string(config.getNumRows()) + " lines";
+	ab->append(status);
+
+	int len = status.length();
+	while (len < config.getScreenCols() -1) {
+	    ab->append(" ");
+	    len++;
+	}
+
+  	ab->append("\x1b[m");
 }
 
 void editorRefreshScreen()
@@ -231,9 +247,9 @@ void editorRefreshScreen()
 	ab.append("\x1b[H");
 
 	editorDrawRows(&ab);
+	editorDrawStatusBar(&ab);
 
 	ab.append("\x1b[" + std::to_string((config.getCoordinateY() - config.getRowOff()) + 1) + ";" + std::to_string((config.getCoordinateX() - config.getColOff()) + 1) + "H");
-
 	ab.append("\x1b[?25h");
 
 	write(STDOUT_FILENO, ab.c_str(), ab.length());
@@ -327,6 +343,7 @@ void editorProcessKeypress()
 void initEditor()
 {
 	if (getWindowSize(&config.getScreenRows(), &config.getScreenCols()) == -1) die("getWindowSize");
+	config.setScreenRows(config.getScreenRows() - 1);
 }
 
 int main(int argc, char *argv[])
