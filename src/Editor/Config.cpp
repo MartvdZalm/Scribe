@@ -5,6 +5,9 @@ coordinateX(0),
 coordinateY(0),
 rowOff(0),
 colOff(0),
+screenRows(0),
+screenCols(0),
+filename("[No Name]"),
 rows(),
 origTermios() {}
 
@@ -23,6 +26,11 @@ int& Config::getScreenRows()
 int& Config::getScreenCols()
 {
 	return screenCols;
+}
+
+void Config::setScreenRows(int rows)
+{
+	this->screenRows = rows;
 }
 
 int& Config::getCoordinateX()
@@ -85,4 +93,14 @@ void Config::addRow(std::string str)
 	Row row;
 	row.setString(str);
 	rows.push_back(row);
+}
+
+std::string Config::getFilename()
+{
+	return filename;
+}
+
+void Config::setFilename(std::string filename)
+{
+	this->filename = filename;
 }

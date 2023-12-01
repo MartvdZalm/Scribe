@@ -15,6 +15,7 @@ private:
     int screenRows;
     int screenCols;
     std::vector<Row> rows;
+    std::string filename;
     termios origTermios;
 
 public:
@@ -27,6 +28,8 @@ public:
     int& getScreenRows();
 
     int& getScreenCols();
+
+    void setScreenRows(int rows);
 
     int& getCoordinateX();
 
@@ -51,6 +54,10 @@ public:
     Row& getRowAt(int index);
 
     void addRow(std::string str);
+
+    std::string getFilename();
+
+    void setFilename(std::string filename);
 };
 
 #endif
