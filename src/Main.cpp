@@ -228,12 +228,16 @@ void editorDrawStatusBar(std::string *ab)
 	std::string status = config.getFilename().substr(0, 20) + " - " +  std::to_string(config.getNumRows()) + " lines";
 	ab->append(status);
 
-	int len = status.length();
-	while (len < config.getScreenCols() -1) {
-	    ab->append(" ");
-	    len++;
-	}
+    int availableSpace = config.getScreenCols() - (status.length() + 1);
 
+    if (availableSpace >= static_cast<int>(std::to_string(config.getCoordinateY() + 1).length())) {
+        while (availableSpace > static_cast<int>(std::to_string(config.getCoordinateY() + 1).length())) {
+            ab->append(" ");
+            availableSpace--;
+        }
+    } 
+
+	ab->append(std::to_string(config.getCoordinateY() + 1));
   	ab->append("\x1b[m");
 }
 
