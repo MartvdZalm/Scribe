@@ -1,5 +1,5 @@
 CXX = g++
-CXXFLAGS = -std=c++11 -Wall -I./headers
+CXXFLAGS = -std=c++17 -Wall -I./headers
 LDFLAGS =
 SRC_DIR = src
 OBJ_DIR = obj
