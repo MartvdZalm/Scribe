@@ -11,6 +11,7 @@
 #include <fstream>
 #include <algorithm>
 #include <cctype>
+#include <time.h>
 
 #include <Editor/Config.h>
 #include <Editor/Key.h>
@@ -239,6 +240,16 @@ void editorDrawStatusBar(std::string *ab)
 
 	ab->append(std::to_string(config.getCoordinateY() + 1));
   	ab->append("\x1b[m");
+	ab->append("\r\n");
+}
+
+void editorDrawMessageBar(std::string *ab)
+{
+	ab->append("\x1b[K");
+
+	if (time(NULL) - config.getStatusMessageTime() < 5) {
+		ab->append(config.getStatusMessage());
+	}
 }
 
 void editorRefreshScreen()
@@ -252,6 +263,7 @@ void editorRefreshScreen()
 
 	editorDrawRows(&ab);
 	editorDrawStatusBar(&ab);
+	editorDrawMessageBar(&ab);
 
 	ab.append("\x1b[" + std::to_string((config.getCoordinateY() - config.getRowOff()) + 1) + ";" + std::to_string((config.getCoordinateX() - config.getColOff()) + 1) + "H");
 	ab.append("\x1b[?25h");
@@ -344,10 +356,17 @@ void editorProcessKeypress()
 	}
 }
 
+void editorSetStatusMessage(std::string message)
+{
+	config.setStatusMessage(message);
+	config.setStatusMessageTime(time(NULL));
+}
+
+
 void initEditor()
 {
 	if (getWindowSize(&config.getScreenRows(), &config.getScreenCols()) == -1) die("getWindowSize");
-	config.setScreenRows(config.getScreenRows() - 1);
+	config.setScreenRows(config.getScreenRows() - 2);
 }
 
 int main(int argc, char *argv[])
@@ -358,6 +377,8 @@ int main(int argc, char *argv[])
 	if (argc >= 2) {
 		editorOpen(argv[1]);
 	}
+
+	editorSetStatusMessage("HELP: Ctrl-Q = quit");
 
   	while (1) {
   		editorRefreshScreen();
