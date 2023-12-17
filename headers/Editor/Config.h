@@ -2,6 +2,9 @@
 #define CONFIG_H
 
 #include <vector>
+#include <fstream>
+#include <filesystem>
+#include <cstring>
 #include <termios.h>
 #include <time.h>
 #include <Editor/Row.h>
@@ -15,6 +18,7 @@ private:
     int colOff;
     int screenRows;
     int screenCols;
+    int dirty;
     std::vector<Row> rows;
     std::string filename;
     std::string statusMessage;
@@ -50,6 +54,10 @@ public:
 
     void setColOff(int off);
 
+    int& getDirty();
+
+    void setDirty(int dirty);
+
     int getNumRows();
 
     std::vector<Row>& getRows();
@@ -68,7 +76,7 @@ public:
 
     time_t getStatusMessageTime();
 
-    void setStatusMessageTime(time_t time);
+    void saveRows();
 };
 
 #endif

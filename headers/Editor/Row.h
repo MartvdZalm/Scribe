@@ -18,6 +18,8 @@ public:
 	std::string& getString();
 
 	void setString(std::string str);
+
+	void insert(int i, char c);
 };
 
 #endif
