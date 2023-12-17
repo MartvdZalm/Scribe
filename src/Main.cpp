@@ -226,7 +226,10 @@ void editorDrawStatusBar(std::string *ab)
 {
 	ab->append("\x1b[7m");
 
-	std::string status = config.getFilename().substr(0, 20) + " - " +  std::to_string(config.getNumRows()) + " lines";
+	std::string status = config.getFilename().substr(0, 20) + " - " + 
+	std::to_string(config.getNumRows()) + " lines " +
+	(config.getDirty() ? "(modified)" : "");
+
 	ab->append(status);
 
     int availableSpace = config.getScreenCols() - (status.length() + 1);
@@ -316,16 +319,43 @@ void editorMoveCursor(int key)
 	}
 }
 
+void editorInsertChar(int c)
+{
+	if (config.getCoordinateY() == config.getNumRows()) {
+		config.addRow("");
+	}
+
+	Row *row = &config.getRowAt(config.getCoordinateY());
+	int index = config.getCoordinateX();
+
+	if (index < 0 || index > row->getSize()) {
+		index = row->getSize();
+	}
+
+	row->insert(index, c);
+
+	config.setCoordinateX(config.getCoordinateX() + 1);	
+	config.setDirty(config.getDirty() + 1);
+}
+
 void editorProcessKeypress()
 {
 	int c = editorReadKey();
 
 	switch (c) {
 
+	case '\r':
+		/* TODO */
+		break;
+
 	case CTRL_KEY('q'):
 		write(STDOUT_FILENO, "\x1b[2J", 4);
 		write(STDOUT_FILENO, "\x1b[H", 3);
 		exit(0);
+		break;
+
+	case CTRL_KEY('s'):
+		config.saveRows();
 		break;
 
 	case HOME_KEY:
@@ -334,6 +364,12 @@ void editorProcessKeypress()
 
 	case END_KEY:
 		config.setCoordinateX(config.getScreenCols() - 1);
+		break;
+
+	case BACKSPACE:
+	case CTRL_KEY('h'):
+	case DEL_KEY:
+
 		break;
 
 	case PAGE_UP:
@@ -353,15 +389,15 @@ void editorProcessKeypress()
 		editorMoveCursor(c);
 		break;
 
+	case CTRL_KEY('l'):
+	case '\x1b':
+		break;
+
+	default:
+		editorInsertChar(c);
+		break;
 	}
 }
-
-void editorSetStatusMessage(std::string message)
-{
-	config.setStatusMessage(message);
-	config.setStatusMessageTime(time(NULL));
-}
-
 
 void initEditor()
 {
@@ -378,7 +414,7 @@ int main(int argc, char *argv[])
 		editorOpen(argv[1]);
 	}
 
-	editorSetStatusMessage("HELP: Ctrl-Q = quit");
+	config.setStatusMessage("HELP: Ctrl-S = save | Ctrl-Q = quit");
 
   	while (1) {
   		editorRefreshScreen();

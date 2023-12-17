@@ -7,10 +7,11 @@ rowOff(0),
 colOff(0),
 screenRows(0),
 screenCols(0),
+dirty(0),
+rows(),
 filename("[No Name]"),
 statusMessage("\0"),
 statusMessageTime(0),
-rows(),
 origTermios() {}
 
 Config::~Config() {}
@@ -75,6 +76,16 @@ void Config::setColOff(int off)
 	colOff = off;
 }
 
+int& Config::getDirty()
+{
+	return dirty;
+}
+
+void Config::setDirty(int dirty)
+{
+	this->dirty = dirty;
+}
+
 int Config::getNumRows()
 {
 	return rows.size();
@@ -112,9 +123,10 @@ std::string Config:: getStatusMessage()
 	return statusMessage;
 }
 
-void  Config::setStatusMessage(std::string message)
+void Config::setStatusMessage(std::string message)
 {
-	this->statusMessage = message;
+	statusMessageTime = time(NULL);
+	statusMessage = message;
 }
 
 time_t Config::getStatusMessageTime()
@@ -122,7 +134,25 @@ time_t Config::getStatusMessageTime()
 	return statusMessageTime;
 }
 
-void  Config::setStatusMessageTime(time_t time)
+void Config::saveRows()
 {
-	this->statusMessageTime = time;
+    if (filename == "[No Name]") return;
+
+    std::filesystem::path cwd = std::filesystem::current_path() / filename;
+    std::ofstream outputFile(cwd.string(), std::ios::binary);
+
+    if (!outputFile.is_open()) {
+        setStatusMessage("Can't save! I/O error: " + std::string(std::strerror(errno)));
+        return;
+    }
+
+    for (Row& row : rows) {
+        outputFile << row.getString() << '\n';
+    }
+
+    outputFile.close();
+
+    std::uintmax_t fileSize = std::filesystem::file_size(cwd);
+
+    setStatusMessage(std::to_string(fileSize) + " bytes written to disk");
 }

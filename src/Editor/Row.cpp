@@ -1,6 +1,7 @@
 #include "Editor/Row.h"
 
-Row::Row() {}
+Row::Row() :
+str("") {}
 
 Row::~Row() {}
 
@@ -28,4 +29,13 @@ std::string& Row::getString()
 void Row::setString(std::string str)
 {
 	this->str = str;
+}
+
+void Row::insert(int i, char c)
+{
+    if (str.length() == 0) {
+        str.push_back(c);
+    } else {
+        str.insert(i, 1, c);
+    }
 }
