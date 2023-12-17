@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <termios.h>
+#include <time.h>
 #include <Editor/Row.h>
 
 class Config
@@ -16,6 +17,8 @@ private:
     int screenCols;
     std::vector<Row> rows;
     std::string filename;
+    std::string statusMessage;
+    time_t statusMessageTime;
     termios origTermios;
 
 public:
@@ -58,6 +61,14 @@ public:
     std::string getFilename();
 
     void setFilename(std::string filename);
+
+    std::string getStatusMessage();
+
+    void setStatusMessage(std::string message);
+
+    time_t getStatusMessageTime();
+
+    void setStatusMessageTime(time_t time);
 };
 
 #endif

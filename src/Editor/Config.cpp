@@ -8,6 +8,8 @@ colOff(0),
 screenRows(0),
 screenCols(0),
 filename("[No Name]"),
+statusMessage("\0"),
+statusMessageTime(0),
 rows(),
 origTermios() {}
 
@@ -103,4 +105,24 @@ std::string Config::getFilename()
 void Config::setFilename(std::string filename)
 {
 	this->filename = filename;
+}
+
+std::string Config:: getStatusMessage()
+{
+	return statusMessage;
+}
+
+void  Config::setStatusMessage(std::string message)
+{
+	this->statusMessage = message;
+}
+
+time_t Config::getStatusMessageTime()
+{
+	return statusMessageTime;
+}
+
+void  Config::setStatusMessageTime(time_t time)
+{
+	this->statusMessageTime = time;
 }
