@@ -18,17 +18,17 @@ Config::~Config() {}
 
 termios& Config::getOrigTermios()
 {
-	return origTermios;
+	return this->origTermios;
 }
 
 int& Config::getScreenRows()
 {
-	return screenRows;
+	return this->screenRows;
 }
 
 int& Config::getScreenCols()
 {
-	return screenCols;
+	return this->screenCols;
 }
 
 void Config::setScreenRows(int rows)
@@ -38,47 +38,47 @@ void Config::setScreenRows(int rows)
 
 int& Config::getCoordinateX()
 {
-	return coordinateX;
+	return this->coordinateX;
 }
 
 int& Config::getCoordinateY()
 {
-	return coordinateY;
+	return this->coordinateY;
 }
 
 void Config::setCoordinateX(int x)
 {
-	coordinateX = x;
+	this->coordinateX = x;
 }
 
 void Config::setCoordinateY(int y)
 {
-	coordinateY = y;
+	this->coordinateY = y;
 }
 
 int& Config::getRowOff()
 {
-	return rowOff;
+	return this->rowOff;
 }
 
 void Config::setRowOff(int off)
 {
-	rowOff = off;
+	this->rowOff = off;
 }
 
 int& Config::getColOff()
 {
-	return colOff;
+	return this->colOff;
 }
 
 void Config::setColOff(int off)
 {
-	colOff = off;
+	this->colOff = off;
 }
 
 int& Config::getDirty()
 {
-	return dirty;
+	return this->dirty;
 }
 
 void Config::setDirty(int dirty)
@@ -86,31 +86,36 @@ void Config::setDirty(int dirty)
 	this->dirty = dirty;
 }
 
+void Config::incDirty()
+{
+	this->dirty++;
+}
+
 int Config::getNumRows()
 {
-	return rows.size();
+	return this->rows.size();
 }
 
 std::vector<Row>& Config::getRows()
 {
-	return rows;
+	return this->rows;
 }
 
 Row& Config::getRowAt(int index)
 {
-	return rows.at(index);
+	return this->rows.at(index);
 }
 
 void Config::addRow(std::string str)
 {
 	Row row;
 	row.setString(str);
-	rows.push_back(row);
+	this->rows.push_back(row);
 }
 
 std::string Config::getFilename()
 {
-	return filename;
+	return this->filename;
 }
 
 void Config::setFilename(std::string filename)
@@ -120,18 +125,18 @@ void Config::setFilename(std::string filename)
 
 std::string Config:: getStatusMessage()
 {
-	return statusMessage;
+	return this->statusMessage;
 }
 
 void Config::setStatusMessage(std::string message)
 {
-	statusMessageTime = time(NULL);
-	statusMessage = message;
+	this->statusMessageTime = time(NULL);
+	this->statusMessage = message;
 }
 
 time_t Config::getStatusMessageTime()
 {
-	return statusMessageTime;
+	return this->statusMessageTime;
 }
 
 void Config::saveRows()
@@ -142,11 +147,11 @@ void Config::saveRows()
     std::ofstream outputFile(cwd.string(), std::ios::binary);
 
     if (!outputFile.is_open()) {
-        setStatusMessage("Can't save! I/O error: " + std::string(std::strerror(errno)));
+        this->setStatusMessage("Can't save! I/O error: " + std::string(std::strerror(errno)));
         return;
     }
 
-    for (Row& row : rows) {
+    for (Row& row : this->rows) {
         outputFile << row.getString() << '\n';
     }
 
