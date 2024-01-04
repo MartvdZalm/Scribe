@@ -41,19 +41,39 @@ int& Config::getCoordinateX()
 	return this->coordinateX;
 }
 
-int& Config::getCoordinateY()
-{
-	return this->coordinateY;
-}
-
 void Config::setCoordinateX(int x)
 {
 	this->coordinateX = x;
 }
 
+void Config::incCoordinateX()
+{
+	this->coordinateX++;
+}
+
+void Config::decCoordinateX()
+{
+	this->coordinateX--;
+}
+
+int& Config::getCoordinateY()
+{
+	return this->coordinateY;
+}
+
 void Config::setCoordinateY(int y)
 {
 	this->coordinateY = y;
+}
+
+void Config::incCoordinateY()
+{
+	this->coordinateY++;
+}
+
+void Config::decCoordinateY()
+{
+	this->coordinateY--;
 }
 
 int& Config::getRowOff()

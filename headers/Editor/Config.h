@@ -40,11 +40,19 @@ public:
 
     int& getCoordinateX();
 
-    int& getCoordinateY();
-
     void setCoordinateX(int x);
 
+    void incCoordinateX();
+
+    void decCoordinateX();
+
+    int& getCoordinateY();
+
     void setCoordinateY(int y);
+
+    void incCoordinateY();
+
+    void decCoordinateY();
 
     int& getRowOff();
 

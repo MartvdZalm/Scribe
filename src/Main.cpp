@@ -283,31 +283,31 @@ void editorMoveCursor(int key)
 
 	case ARROW_LEFT:
 		if (config.getCoordinateX() != 0) {
-			config.setCoordinateX(config.getCoordinateX() - 1);
+			config.decCoordinateX();
 		} else if (config.getCoordinateY() > 0) {
-			config.setCoordinateY(config.getCoordinateY() - 1);
+			config.decCoordinateY();
 			config.setCoordinateX(config.getRowAt(config.getCoordinateY()).getSize());
 		}
 		break;
 
 	case ARROW_RIGHT:
 		if (row && config.getCoordinateX() < row->getSize()) {
-			config.setCoordinateX(config.getCoordinateX() + 1);
+			config.incCoordinateX();
 		} else if (row && config.getCoordinateX() == row->getSize()) {
-			config.setCoordinateY(config.getCoordinateY() + 1);
+			config.incCoordinateY();
 			config.setCoordinateX(0);
 		}
 		break;
 
 	case ARROW_UP:
 		if (config.getCoordinateY() != 0) {
-			config.setCoordinateY(config.getCoordinateY() - 1);
+			config.decCoordinateY();
 		}
 		break;
 
 	case ARROW_DOWN:
 		if (config.getCoordinateY() < config.getNumRows()) {
-			config.setCoordinateY(config.getCoordinateY() + 1);
+			config.incCoordinateY();
 		}
 		break;
 	}
@@ -335,8 +335,8 @@ void editorInsertChar(int c)
 
 	row->insert(index, c);
 
-	config.setCoordinateX(config.getCoordinateX() + 1);	
-	config.setDirty(config.getDirty() + 1);
+	config.incCoordinateX();	
+	config.incDirty();
 }
 
 void editorProcessKeypress()
