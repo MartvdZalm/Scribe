@@ -58,6 +58,8 @@ public:
 
     void setDirty(int dirty);
 
+    void incDirty();
+
     int getNumRows();
 
     std::vector<Row>& getRows();
