@@ -19,6 +19,7 @@
 
 #define SCRIBE_VERSION "0.0.1"
 #define SCRIBE_TAB_STOP 4
+#define SCRIBE_QUIT_TIMES 2
 
 #define CTRL_KEY(k) ((k) & 0x1f)
 
@@ -340,6 +341,7 @@ void editorInsertChar(int c)
 
 void editorProcessKeypress()
 {
+	static int quitTimes = SCRIBE_QUIT_TIMES;
 	int c = editorReadKey();
 
 	switch (c) {
@@ -349,6 +351,12 @@ void editorProcessKeypress()
 		break;
 
 	case CTRL_KEY('q'):
+		if (config.getDirty() != 0 && quitTimes > 0) {
+
+        config.setStatusMessage("WARNING!!! File has unsaved changes. Press Ctrl-Q " + std::to_string(quitTimes) + " more times to quit.");
+        quitTimes--;
+        return;
+      	}
 		write(STDOUT_FILENO, "\x1b[2J", 4);
 		write(STDOUT_FILENO, "\x1b[H", 3);
 		exit(0);
@@ -397,6 +405,8 @@ void editorProcessKeypress()
 		editorInsertChar(c);
 		break;
 	}
+
+	quitTimes = SCRIBE_QUIT_TIMES;
 }
 
 void initEditor()
