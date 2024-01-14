@@ -386,6 +386,28 @@ void editorDeleteChar()
 	}
 }
 
+std::string editorPrompt(std::string prompt)
+{
+	std::string input;
+
+	while (1) {
+		config.setStatusMessage(prompt);
+		editorRefreshScreen();
+
+		int c = editorReadKey();
+
+		if (c == '\r') {
+			if (input.length() != 0) {
+				config.setStatusMessage("");
+				return input;
+			}
+		} else if (!iscntrl(c) && c < 128) {
+			input.push_back(c);
+			prompt.push_back(c);
+		}
+	}
+}
+
 void editorProcessKeypress()
 {
 	static int quitTimes = SCRIBE_QUIT_TIMES;
@@ -410,6 +432,10 @@ void editorProcessKeypress()
 		break;
 
 	case CTRL_KEY('s'):
+		if (config.getFilename() == "[No Name]") {
+			config.setFilename(editorPrompt("Save as: "));
+		}
+
 		config.saveRows();
 		break;
 
