@@ -162,7 +162,7 @@ void editorOpen(char *filename)
         	return !std::isspace(ch);
     	}).base(), line.end());
 
-    	config.addRow(line);
+    	config.addRow(config.getNumRows(), line);
     }
 
     file.close();
@@ -323,7 +323,7 @@ void editorMoveCursor(int key)
 void editorInsertChar(int c)
 {
 	if (config.getCoordinateY() == config.getNumRows()) {
-		config.addRow("");
+		config.addRow(config.getNumRows(), "");
 	}
 
 	Row *row = &config.getRowAt(config.getCoordinateY());
@@ -333,10 +333,57 @@ void editorInsertChar(int c)
 		index = row->getSize();
 	}
 
-	row->insert(index, c);
+	row->insertChar(index, c);
 
 	config.incCoordinateX();	
 	config.incDirty();
+}
+
+void editorInsertNewline()
+{
+	if (config.getCoordinateX() == 0) {
+		config.addRow(config.getCoordinateY(), "");
+	} else {
+		Row *row = &config.getRowAt(config.getCoordinateY());
+
+		std::string substring = row->getString().substr(config.getCoordinateX());
+		row->getString().erase(config.getCoordinateX());
+		config.addRow(config.getCoordinateY() + 1, substring);
+	}
+
+	config.incCoordinateY();
+	config.setCoordinateX(0);
+}
+
+void editorDeleteChar()
+{
+	if (config.getCoordinateY() == config.getNumRows()) {
+		return;
+	}
+
+	if (config.getCoordinateX() == 0 && config.getCoordinateY() == 0) {
+		return;
+	}
+
+	Row *row = &config.getRowAt(config.getCoordinateY());
+  		
+	if (config.getCoordinateX() > 0) {
+		int index = config.getCoordinateX() - 1;
+
+		if (index < 0 || index > row->getSize()) {
+			return;
+		}
+
+		row->getString().erase(index, 1);
+		config.incDirty();
+
+		config.decCoordinateX();
+	} else {
+		config.setCoordinateX(config.getRowAt(config.getCoordinateY() - 1).getSize());
+		config.deleteRow(config.getCoordinateY());
+
+		config.decCoordinateY();
+	}
 }
 
 void editorProcessKeypress()
@@ -347,7 +394,7 @@ void editorProcessKeypress()
 	switch (c) {
 
 	case '\r':
-		/* TODO */
+		editorInsertNewline();
 		break;
 
 	case CTRL_KEY('q'):
@@ -377,7 +424,8 @@ void editorProcessKeypress()
 	case BACKSPACE:
 	case CTRL_KEY('h'):
 	case DEL_KEY:
-
+     	if (c == DEL_KEY) editorMoveCursor(ARROW_RIGHT);
+      	editorDeleteChar();
 		break;
 
 	case PAGE_UP:
