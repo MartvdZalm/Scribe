@@ -19,7 +19,9 @@ public:
 
 	void setString(std::string str);
 
-	void insert(int i, char c);
+	void insertChar(int i, char c);
+
+	void insertString(int i, std::string input);
 };
 
 #endif
