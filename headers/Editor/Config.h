@@ -74,7 +74,7 @@ public:
 
     Row& getRowAt(int index);
 
-    void addRow(std::string str);
+    void addRow(int index, std::string str);
 
     std::string getFilename();
 
@@ -87,6 +87,8 @@ public:
     time_t getStatusMessageTime();
 
     void saveRows();
+
+    void deleteRow(int index);
 };
 
 #endif

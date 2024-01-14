@@ -126,11 +126,20 @@ Row& Config::getRowAt(int index)
 	return this->rows.at(index);
 }
 
-void Config::addRow(std::string str)
+void Config::addRow(int index, std::string str)
 {
+	if (index < 0 || index > getNumRows()) {
+		return;
+	}
+
 	Row row;
 	row.setString(str);
-	this->rows.push_back(row);
+
+	if (index == getNumRows()) {
+		this->rows.push_back(row);
+	} else {
+		this->rows.insert(this->rows.begin() + index, row);
+	}
 }
 
 std::string Config::getFilename()
@@ -180,4 +189,20 @@ void Config::saveRows()
     std::uintmax_t fileSize = std::filesystem::file_size(cwd);
 
     setStatusMessage(std::to_string(fileSize) + " bytes written to disk");
+}
+
+void Config::deleteRow(int index)
+{
+	Row *currentRow = &getRowAt(getCoordinateY());
+	if (index < 0 || index >= getNumRows()) {
+		return;
+	}
+
+	if (currentRow->getSize() != 0) {
+		Row *row = &getRowAt(getCoordinateY() - 1);
+		row->insertString(row->getSize(), currentRow->getString());
+	}
+
+	rows.erase(rows.begin() + index);
+	incDirty();
 }
