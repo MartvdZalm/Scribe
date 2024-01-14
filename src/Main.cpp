@@ -396,8 +396,16 @@ std::string editorPrompt(std::string prompt)
 
 		int c = editorReadKey();
 
-		if (c == '\r') {
-			if (input.length() != 0) {
+		if (c == DEL_KEY || c == CTRL_KEY('h') || c == BACKSPACE) {
+			if (!input.empty()) {
+		        input.pop_back();
+		        prompt.pop_back();
+		    }
+		} else if (c == '\x1b') {
+			config.setStatusMessage("");
+			return "[No Name]";
+		} else if (c == '\r') {
+			if (!input.empty()) {
 				config.setStatusMessage("");
 				return input;
 			}
@@ -432,8 +440,14 @@ void editorProcessKeypress()
 		break;
 
 	case CTRL_KEY('s'):
+
 		if (config.getFilename() == "[No Name]") {
 			config.setFilename(editorPrompt("Save as: "));
+
+			if (config.getFilename() == "[No Name]") {
+				config.setStatusMessage("Save aborted");
+				return;
+			}
 		}
 
 		config.saveRows();
