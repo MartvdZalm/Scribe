@@ -422,18 +422,45 @@ std::string editorPrompt(std::string prompt, void (*callback)(std::string, int))
 
 void editorFindCallback(std::string query, int key)
 {
+	static int lastMatch = -1;
+	static int direction = 1;
+
 	if (key == '\r' || key == '\x1b') {
+		lastMatch = -1;
+		direction = 1;
 		return;
+	} else if (key == ARROW_RIGHT || key == ARROW_DOWN) {
+		direction = 1;
+	} else if (key == ARROW_LEFT || key == ARROW_UP) {
+		direction = -1;
+	} else {
+		lastMatch = -1;
+		direction = 1;
 	}
 
+	if (lastMatch == -1) {
+		direction = 1;
+	}
+
+	int current = lastMatch;
+
 	for (int i = 0; i < config.getNumRows(); i++) {
-		Row *row = &config.getRowAt(i);
+		current += direction;
+
+		if (current == -1) {
+			current = config.getNumRows() - 1;
+		} else if (current == config.getNumRows()) {
+			current = 0;
+		}
+
+		Row *row = &config.getRowAt(current);
 		std::string rowString = row->getString();
 
 		size_t position = rowString.find(query);
 
 		if (position != std::string::npos) {
-			config.setCoordinateY(i);
+			lastMatch = current;
+			config.setCoordinateY(current);
 			config.setCoordinateX(position);
 			config.setRowOff(config.getNumRows());
 			break;
