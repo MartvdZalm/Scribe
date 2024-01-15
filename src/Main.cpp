@@ -386,7 +386,7 @@ void editorDeleteChar()
 	}
 }
 
-std::string editorPrompt(std::string prompt)
+std::string editorPrompt(std::string prompt, void (*callback)(std::string, int))
 {
 	std::string input;
 
@@ -403,16 +403,58 @@ std::string editorPrompt(std::string prompt)
 		    }
 		} else if (c == '\x1b') {
 			config.setStatusMessage("");
-			return "[No Name]";
+			if (callback) callback(input, c);
+			return "";
 		} else if (c == '\r') {
 			if (!input.empty()) {
 				config.setStatusMessage("");
+				if (callback) callback(input, c);
 				return input;
 			}
 		} else if (!iscntrl(c) && c < 128) {
 			input.push_back(c);
 			prompt.push_back(c);
 		}
+
+		if (callback) callback(input, c);
+	}
+}
+
+void editorFindCallback(std::string query, int key)
+{
+	if (key == '\r' || key == '\x1b') {
+		return;
+	}
+
+	for (int i = 0; i < config.getNumRows(); i++) {
+		Row *row = &config.getRowAt(i);
+		std::string rowString = row->getString();
+
+		size_t position = rowString.find(query);
+
+		if (position != std::string::npos) {
+			config.setCoordinateY(i);
+			config.setCoordinateX(position);
+			config.setRowOff(config.getNumRows());
+			break;
+        }
+	}
+}
+
+void editorFind()
+{
+	int savedCx = config.getCoordinateX();
+	int savedCy = config.getCoordinateY();
+	int savedRowOff = config.getRowOff();
+	int savedColOff = config.getColOff();
+
+	std::string query = editorPrompt("Search: ", editorFindCallback);
+
+	if (query.empty()) {
+		config.setCoordinateX(savedCx);
+		config.setCoordinateY(savedCy);
+		config.setRowOff(savedRowOff);
+		config.setColOff(savedColOff);
 	}
 }
 
@@ -429,11 +471,11 @@ void editorProcessKeypress()
 
 	case CTRL_KEY('q'):
 		if (config.getDirty() != 0 && quitTimes > 0) {
-
-        config.setStatusMessage("WARNING!!! File has unsaved changes. Press Ctrl-Q " + std::to_string(quitTimes) + " more times to quit.");
-        quitTimes--;
-        return;
+	        config.setStatusMessage("WARNING!!! File has unsaved changes. Press Ctrl-Q " + std::to_string(quitTimes) + " more times to quit.");
+	        quitTimes--;
+	        return;
       	}
+
 		write(STDOUT_FILENO, "\x1b[2J", 4);
 		write(STDOUT_FILENO, "\x1b[H", 3);
 		exit(0);
@@ -442,9 +484,11 @@ void editorProcessKeypress()
 	case CTRL_KEY('s'):
 
 		if (config.getFilename() == "[No Name]") {
-			config.setFilename(editorPrompt("Save as: "));
+			std::string filename = editorPrompt("Save as: ", NULL);
 
-			if (config.getFilename() == "[No Name]") {
+			if (!filename.empty()) {
+				config.setFilename(filename);
+			} else {
 				config.setStatusMessage("Save aborted");
 				return;
 			}
@@ -459,6 +503,10 @@ void editorProcessKeypress()
 
 	case END_KEY:
 		config.setCoordinateX(config.getScreenCols() - 1);
+		break;
+
+	case CTRL_KEY('f'):
+		editorFind();
 		break;
 
 	case BACKSPACE:
@@ -512,7 +560,7 @@ int main(int argc, char *argv[])
 		editorOpen(argv[1]);
 	}
 
-	config.setStatusMessage("HELP: Ctrl-S = save | Ctrl-Q = quit");
+	config.setStatusMessage("HELP: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F = find");
 
   	while (1) {
   		editorRefreshScreen();
