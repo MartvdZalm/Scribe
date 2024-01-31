@@ -7,7 +7,7 @@
 #include <cstring>
 #include <termios.h>
 #include <time.h>
-#include <Editor/Row.h>
+#include <Row.h>
 
 class Config
 {

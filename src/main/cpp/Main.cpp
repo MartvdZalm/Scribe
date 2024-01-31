@@ -13,9 +13,9 @@
 #include <cctype>
 #include <time.h>
 
-#include <Editor/Config.h>
-#include <Editor/Key.h>
-#include <Editor/Row.h>
+#include <Config.h>
+#include <Key.h>
+#include <Row.h>
 
 #define SCRIBE_VERSION "0.0.1"
 #define SCRIBE_TAB_STOP 4

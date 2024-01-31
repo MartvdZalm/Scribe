@@ -1,4 +1,4 @@
-#include "Editor/Config.h"
+#include "Config.h"
 
 Config::Config() : 
 coordinateX(0), 

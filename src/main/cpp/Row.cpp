@@ -1,4 +1,4 @@
-#include "Editor/Row.h"
+#include "Row.h"
 
 Row::Row() :
 str("") {}
