@@ -1,4 +1,4 @@
-#include "Editor/Config.h"
+#include "editor/Config.hpp"
 
 Config::Config() : 
 x(0), 
@@ -25,7 +25,7 @@ int Config::getCursorPosition()
 	buf[i] = '\0';
 
 	if (buf[0] != '\x1b' || buf[1] != '[') return -1;
-	if (sscanf(&buf[2], "%d;%d", screenRows, screenCols) != 2) return -1;
+	if (sscanf(&buf[2], "%d;%d", &screenRows, &screenCols) != 2) return -1;
 
 	return 0;
 }

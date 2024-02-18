@@ -2,7 +2,7 @@
 #define TERMINAL_H
 
 #include <termios.h>
-#include "Editor/Exceptions.h"
+#include "editor/exceptions/Exceptions.hpp"
 
 class Terminal
 {

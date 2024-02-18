@@ -8,11 +8,13 @@
 #include <termios.h>
 #include <time.h>
 
-#include "Editor/Terminal.h"
-#include "Editor/Exceptions.h"
-#include "Editor/Key.h"
-#include "Editor/Row.h"
-#include "Editor/Config.h"
+#include "editor/terminal/Terminal.hpp"
+#include "editor/exceptions/Exceptions.hpp"
+#include "editor/keybindings/Key.hpp"
+#include "editor/highlighting/Highlighting.hpp"
+#include "editor/highlighting/syntaxes/Knight.hpp"
+#include "editor/Row.hpp"
+#include "editor/Config.hpp"
 
 #define SCRIBE_VERSION "0.0.1"
 #define SCRIBE_TAB_STOP 4
@@ -26,6 +28,7 @@ public:
 	Config config;
 	Terminal terminal;
 	Exceptions exception;
+	Highlighting highlighting;
 
 	int dirty;
 	std::string filename;
@@ -53,6 +56,7 @@ public:
 	void processKeypress();
 	void save();
 	void setStatusMessage(std::string message);
+	void updateSyntax(Row* row);
 
 	std::string prompt(std::string prompt, void (*callback)(std::vector<Row> rows, Config& config, std::string, int));
 };

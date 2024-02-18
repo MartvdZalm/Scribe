@@ -1,12 +1,24 @@
-# add_executable(ScribeExecutable
-#     cpp/Main.cpp
-# )
-
 file(GLOB SRC_FILES
-    "cpp/Editor/*.cpp"
-    "cpp/Main.cpp"
+    "cpp/*.cpp"
+
+    # Editor
+    "cpp/editor/*.cpp"
+
+    # Highlighting
+    "cpp/editor/highlighting/*.cpp"
+    "cpp/editor/highlighting/syntaxes/*.cpp"
+
+    # Keybindings
+    "cpp/editor/keybindings/*.cpp"
+
+    # Terminal
+    "cpp/editor/terminal/*.cpp"
+
+    # Exceptions
+    "cpp/editor/exceptions/*.cpp"
+
 )
 
 add_executable(ScribeExecutable ${SRC_FILES})
 
-target_include_directories(ScribeExecutable PRIVATE include/Scribe)
+target_include_directories(ScribeExecutable PRIVATE include/scribe)

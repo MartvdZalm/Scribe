@@ -1,4 +1,4 @@
-#include "Editor/Editor.h"
+#include "editor/Editor.hpp"
 
 int main(int argc, char *argv[])
 {

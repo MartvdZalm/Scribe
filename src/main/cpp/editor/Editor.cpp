@@ -1,9 +1,10 @@
-#include "Editor/Editor.h"
+#include "editor/Editor.hpp"
 
 Editor::Editor() :
 config(),
 terminal(),
 exception(),
+highlighting(),
 dirty(0),
 filename("[No Name]"),
 statusMessage("\0"),
@@ -473,7 +474,7 @@ void Editor::processKeypress()
 
 	case CTRL_KEY('q'):
 		if (dirty != 0 && quitTimes > 0) {
-	        statusMessage = "WARNING!!! File has unsaved changes. Press Ctrl-Q " + std::to_string(quitTimes) + " more times to quit.";
+	        setStatusMessage("WARNING!!! File has unsaved changes. Press Ctrl-Q " + std::to_string(quitTimes) + " more times to quit.");
 	        quitTimes--;
 	        return;
       	}
