@@ -21,4 +21,4 @@ file(GLOB SRC_FILES
 
 add_executable(ScribeExecutable ${SRC_FILES})
 
-target_include_directories(ScribeExecutable PRIVATE include/scribe)
+target_include_directories(ScribeExecutable PRIVATE include)
