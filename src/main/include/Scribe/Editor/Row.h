@@ -5,10 +5,9 @@
 
 class Row
 {
-private:
+public:
 	std::string str;
 
-public:
 	Row();
 
 	~Row();
