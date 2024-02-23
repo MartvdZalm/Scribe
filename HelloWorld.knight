@@ -1,0 +1,11 @@
+fn times(int a, int b): int
+{
+	ret a * b;
+}
+
+fn main(): int
+{
+	int result = times(10, 10);
+
+	ret 0;
+}
