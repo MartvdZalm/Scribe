@@ -6,7 +6,7 @@ file(GLOB SRC_FILES
 
     # Highlighting
     "cpp/editor/highlighting/*.cpp"
-    "cpp/editor/highlighting/syntaxes/*.cpp"
+    "cpp/editor/highlighting/syntax/*.cpp"
 
     # Keybindings
     "cpp/editor/keybindings/*.cpp"
