@@ -1,0 +1,10 @@
+{
+  "keywords": ["func", "if", "else", "return", "var"],
+  "types": ["int", "float", "string"],
+  "comments": {
+    "line_comment": "//",
+    "block_comment_start": "/*",
+    "block_comment_end": "*/"
+  },
+  "strings": ["\"", "'"]
+}
