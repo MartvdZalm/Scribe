@@ -4,7 +4,7 @@ Editor::Editor() :
 config(),
 terminal(),
 exception(),
-highlighting(),
+highlighting("resources/syntax/knight.json"),
 dirty(0),
 filename("[No Name]"),
 statusMessage("\0"),
@@ -286,8 +286,10 @@ void Editor::insertChar(int c)
 	}
 
 	row.insertChar(index, c);
-
 	config.x++;	
+
+	highlighting.checkRow(&row);
+
 	dirty++;
 }
 
