@@ -186,9 +186,22 @@ void Editor::drawRows(std::string *ab)
 			if (len < 0) len = 0;
 			if (len > config.screenCols) len = config.screenCols;
 
-			if (rows.at(fileRow).getString().length() > config.colOff) {
-				ab->append(rows.at(fileRow).getString().substr(config.colOff, len));
+			Row* row = &rows.at(fileRow);
+			std::string str = row->getString();
+
+			for (int j = 0; j < len; j++) {
+				if (isdigit(str[j])) {
+					ab->append("\x1b[31m");
+					ab->append(1, str[j]);
+					ab->append("\x1b[39m");
+				} else {
+				 	ab->append(1, str[j]);
+				}
 			}
+
+			// if (rows.at(fileRow).getString().length() > config.colOff) {
+			// 	ab->append(rows.at(fileRow).getString().substr(config.colOff, len));
+			// }
 		}
 
 		ab->append("\x1b[K");
@@ -288,7 +301,7 @@ void Editor::insertChar(int c)
 	row.insertChar(index, c);
 	config.x++;	
 
-	highlighting.checkRow(&row);
+	// highlighting.checkRow(&row);
 
 	dirty++;
 }
@@ -582,4 +595,13 @@ void Editor::setStatusMessage(std::string message)
 {
     statusMessage = message;
     statusMessageTime = time(nullptr);
+}
+
+void Editor::updateSyntax(Row* row)
+{
+	for (int i = 0; i < row->getSize(); i++) {
+		if (isdigit(row->getString()[i])) {
+			row->hl[i] = HL_NUMBER;
+		}
+	}
 }

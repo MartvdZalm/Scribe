@@ -12,6 +12,7 @@
 #include "editor/exceptions/Exceptions.hpp"
 #include "editor/keybindings/Key.hpp"
 #include "editor/highlighting/Highlighting.hpp"
+#include "editor/highlighting/Highlight.hpp"
 #include "editor/Row.hpp"
 #include "editor/Config.hpp"
 

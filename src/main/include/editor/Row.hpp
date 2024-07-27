@@ -7,6 +7,7 @@ class Row
 {
 public:
 	std::string str;
+	unsigned char* hl;
 
 	Row();
 
