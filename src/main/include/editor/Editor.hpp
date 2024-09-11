@@ -11,8 +11,6 @@
 #include "editor/terminal/Terminal.hpp"
 #include "editor/exceptions/Exceptions.hpp"
 #include "editor/keybindings/Key.hpp"
-#include "editor/highlighting/Highlighting.hpp"
-#include "editor/highlighting/Highlight.hpp"
 #include "editor/Row.hpp"
 #include "editor/Config.hpp"
 
@@ -28,7 +26,7 @@ public:
 	Config config;
 	Terminal terminal;
 	Exceptions exception;
-	Highlighting highlighting;
+	// Highlighting highlighting;
 
 	int dirty;
 	std::string filename;
@@ -57,6 +55,7 @@ public:
 	void save();
 	void setStatusMessage(std::string message);
 	void updateSyntax(Row* row);
+	int syntaxToColor(int hl);
 
 	std::string prompt(std::string prompt, void (*callback)(std::vector<Row> rows, Config& config, std::string, int));
 };

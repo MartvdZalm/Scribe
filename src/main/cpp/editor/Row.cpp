@@ -7,19 +7,6 @@ Row::~Row() {}
 
 int Row::getSize()
 {
-	// int rowSize = 0;
-
-    // for (char c : str) {
-
-    //     if (c == '\t') {
-    //         rowSize += (8 - (rowSize % 8));
-    //     } else {
-    //         rowSize++;
-    //     }
-    // }
-
-    // return rowSize;
-
     return str.length();
 }
 

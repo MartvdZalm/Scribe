@@ -1,10 +1,10 @@
 #include "editor/Editor.hpp"
+#include <iostream>
 
 Editor::Editor() :
 config(),
 terminal(),
 exception(),
-highlighting("resources/syntax/knight.json"),
 dirty(0),
 filename("[No Name]"),
 statusMessage("\0"),
@@ -13,11 +13,12 @@ rows()
 {
 	terminal.enableRawMode();
 
-	if (config.getWindowSize() == -1) exception.die("getWindowSize");
+	if (config.getWindowSize() == -1) {
+		exception.die("getWindowSize");
+	}
+
 	config.screenRows = config.screenRows - 2;
-
 	statusMessage = "HELP: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F = find";
-
 	statusMessageTime = time(nullptr);
 }
 
@@ -25,6 +26,8 @@ Editor::~Editor() {}
 
 void Editor::open(char *filename)
 {
+	std::cout << filename << std::endl;
+
 	this->filename = filename;
 
 	std::ifstream file(filename);
@@ -68,46 +71,56 @@ int Editor::readKey()
 	char c;
 
 	while ((nread = read(STDIN_FILENO, &c, 1)) != 1) {
-		if (nread == -1 && errno != EAGAIN) exception.die("read");
+		if (nread == -1 && errno != EAGAIN) {
+			exception.die("read");
+		}
 	}
 
 	if (c == '\x1b') {
 		char seq[3];
 
-		if (read(STDIN_FILENO, &seq[0], 1) != 1) return '\x1b';
-		if (read(STDIN_FILENO, &seq[1], 1) != 1) return '\x1b';
+		if (read(STDIN_FILENO, &seq[0], 1) != 1) {
+			return '\x1b';
+		}
+
+		if (read(STDIN_FILENO, &seq[1], 1) != 1) {
+			return '\x1b';
+		}
 
 		if (seq[0] == '[') {
 
 			if (seq[1] >= '0' && seq[1] <= '9') {
 
-				if (read(STDIN_FILENO, &seq[2], 1) != 1) return '\x1b';
+				if (read(STDIN_FILENO, &seq[2], 1) != 1) {
+					return '\x1b';
+				}
+
 				if (seq[2] == '~') {
 					switch (seq[1]) {
-					case '1': return HOME_KEY;
-					case '3': return DEL_KEY;
-					case '4': return END_KEY;
-					case '5': return PAGE_UP;
-					case '6': return PAGE_DOWN;
-					case '7': return HOME_KEY;
-					case '8': return END_KEY;
+						case '1': return HOME_KEY;
+						case '3': return DEL_KEY;
+						case '4': return END_KEY;
+						case '5': return PAGE_UP;
+						case '6': return PAGE_DOWN;
+						case '7': return HOME_KEY;
+						case '8': return END_KEY;
 					}
 				}
 
 			} else {
 				switch (seq[1]) {
-				case 'A': return ARROW_UP;
-				case 'B': return ARROW_DOWN;
-				case 'C': return ARROW_RIGHT;
-				case 'D': return ARROW_LEFT;
-				case 'H': return HOME_KEY;
-				case 'F': return END_KEY;
+					case 'A': return ARROW_UP;
+					case 'B': return ARROW_DOWN;
+					case 'C': return ARROW_RIGHT;
+					case 'D': return ARROW_LEFT;
+					case 'H': return HOME_KEY;
+					case 'F': return END_KEY;
 				}
 			}
 		} else if (seq[0] == '0') {
 			switch (seq[1]) {
-			case 'H': return HOME_KEY;
-			case 'F': return END_KEY;
+				case 'H': return HOME_KEY;
+				case 'F': return END_KEY;
 			}
 		}
 
@@ -180,28 +193,23 @@ void Editor::drawRows(std::string *ab)
 			} else {
 				ab->append("~");
 			}
-
 		} else {
 			int len = rows.at(fileRow).getSize() - config.colOff;
-			if (len < 0) len = 0;
-			if (len > config.screenCols) len = config.screenCols;
+
+			if (len < 0) {
+				len = 0;
+			}
+
+			if (len > config.screenCols) {
+				len = config.screenCols;
+			}
 
 			Row* row = &rows.at(fileRow);
 			std::string str = row->getString();
 
 			for (int j = 0; j < len; j++) {
-				if (isdigit(str[j])) {
-					ab->append("\x1b[31m");
-					ab->append(1, str[j]);
-					ab->append("\x1b[39m");
-				} else {
-				 	ab->append(1, str[j]);
-				}
+				ab->append(1, str[j]);
 			}
-
-			// if (rows.at(fileRow).getString().length() > config.colOff) {
-			// 	ab->append(rows.at(fileRow).getString().substr(config.colOff, len));
-			// }
 		}
 
 		ab->append("\x1b[K");
@@ -246,35 +254,35 @@ void Editor::moveCursor(int key)
 
 	switch (key) {
 
-	case ARROW_LEFT:
-		if (config.x != 0) {
-			config.x--;
-		} else if (config.y > 0) {
-			config.y--;
-			config.x = rows.at(config.y).getSize();
-		}
-		break;
+		case ARROW_LEFT: {
+			if (config.x != 0) {
+				config.x--;
+			} else if (config.y > 0) {
+				config.y--;
+				config.x = rows.at(config.y).getSize();
+			}
+		} break;
 
-	case ARROW_RIGHT:
-		if (row && config.x < row->getSize()) {
-			config.x++;
-		} else if (row && config.x == row->getSize()) {
-			config.y++;
-			config.x = 0;
-		}
-		break;
+		case ARROW_RIGHT: {
+			if (row && config.x < row->getSize()) {
+				config.x++;
+			} else if (row && config.x == row->getSize()) {
+				config.y++;
+				config.x = 0;
+			}
+		} break;
 
-	case ARROW_UP:
-		if (config.y != 0) {
-			config.y--;
-		}
-		break;
+		case ARROW_UP: {
+			if (config.y != 0) {
+				config.y--;
+			}
+		} break;
 
-	case ARROW_DOWN:
-		if (config.y < rows.size()) {
-			config.y++;
-		}
-		break;
+		case ARROW_DOWN: {
+			if (config.y < rows.size()) {
+				config.y++;
+			}
+		} break;
 	}
 
 	row = (config.y >= rows.size()) ? nullptr : &rows.at(config.y);
@@ -300,9 +308,6 @@ void Editor::insertChar(int c)
 
 	row.insertChar(index, c);
 	config.x++;	
-
-	// highlighting.checkRow(&row);
-
 	dirty++;
 }
 
@@ -482,85 +487,82 @@ void Editor::processKeypress()
 	int c = readKey();
 
 	switch (c) {
+		case '\r': {
+			insertNewline();
+		} break;
 
-	case '\r':
-		insertNewline();
-		break;
+		case CTRL_KEY('q'): {
+			if (dirty != 0 && quitTimes > 0) {
+		        setStatusMessage("WARNING!!! File has unsaved changes. Press Ctrl-Q " + std::to_string(quitTimes) + " more times to quit.");
+		        quitTimes--;
+		        return;
+	      	}
 
-	case CTRL_KEY('q'):
-		if (dirty != 0 && quitTimes > 0) {
-	        setStatusMessage("WARNING!!! File has unsaved changes. Press Ctrl-Q " + std::to_string(quitTimes) + " more times to quit.");
-	        quitTimes--;
-	        return;
-      	}
+			write(STDOUT_FILENO, "\x1b[2J", 4);
+			write(STDOUT_FILENO, "\x1b[H", 3);
+			terminal.disableRawMode();
+			exit(0);
+		} break;
 
-		write(STDOUT_FILENO, "\x1b[2J", 4);
-		write(STDOUT_FILENO, "\x1b[H", 3);
-		terminal.disableRawMode();
-		exit(0);
-		break;
+		case CTRL_KEY('s'): {
+			if (filename == "[No Name]") {
+				std::string name = prompt("Save as: ", NULL);
 
-	case CTRL_KEY('s'):
-
-		if (filename == "[No Name]") {
-			std::string name = prompt("Save as: ", NULL);
-
-			if (!name.empty()) {
-				filename = name;
-			} else {
-				statusMessage = "Save aborted";
-				return;
+				if (!name.empty()) {
+					filename = name;
+				} else {
+					statusMessage = "Save aborted";
+					return;
+				}
 			}
-		}
 
-		save();
-		break;
+			save();
+		} break;
 
-	case HOME_KEY:
-		config.x = 0;
-		break;
+		case HOME_KEY: {
+			config.x = 0;
+		} break;
 
-	case END_KEY:
-		config.x = config.screenCols - 1;
-		break;
+		case END_KEY: {
+			config.x = config.screenCols - 1;
+		} break;
 
-	case CTRL_KEY('f'):
-		find();
-		break;
+		case CTRL_KEY('f'): {
+			find();
+		} break;
 
-	case BACKSPACE:
-	case CTRL_KEY('h'):
-	case DEL_KEY:
-     	if (c == DEL_KEY) {
-     		moveCursor(ARROW_RIGHT);
-     	}
-      	deleteChar();
-		break;
+		case BACKSPACE:
+		case CTRL_KEY('h'):
+		case DEL_KEY: {
+	     	if (c == DEL_KEY) {
+	     		moveCursor(ARROW_RIGHT);
+	     	}
+	      	deleteChar();
+		} break;
 
-	case PAGE_UP:
-	case PAGE_DOWN: 
-		{
+		case PAGE_UP:
+		case PAGE_DOWN: {
 			int times = config.screenRows;
 			while (times--) {
 				moveCursor(c == PAGE_UP ? ARROW_UP : ARROW_DOWN);
 			}
-		}
-		break;
+		} break;
 
-	case ARROW_UP:
-	case ARROW_DOWN:
-	case ARROW_LEFT:
-	case ARROW_RIGHT:
-		moveCursor(c);
-		break;
+		case ARROW_UP:
+		case ARROW_DOWN:
+		case ARROW_LEFT:
+		case ARROW_RIGHT: {
+			moveCursor(c);
+		} break;
 
-	case CTRL_KEY('l'):
-	case '\x1b':
-		break;
+		case CTRL_KEY('l'):
+		case '\x1b':
+			break;
 
-	default:
-		insertChar(c);
-		break;
+		default: {
+			insertChar(c);
+		} break;
+
 	}
 
 	quitTimes = SCRIBE_QUIT_TIMES;
@@ -568,7 +570,9 @@ void Editor::processKeypress()
 
 void Editor::save()
 {
-    if (filename == "[No Name]") return;
+    if (filename == "[No Name]") {
+    	return;
+	}
 
     std::filesystem::path cwd = std::filesystem::current_path() / filename;
     std::ofstream outputFile(cwd.string(), std::ios::binary);
@@ -595,13 +599,4 @@ void Editor::setStatusMessage(std::string message)
 {
     statusMessage = message;
     statusMessageTime = time(nullptr);
-}
-
-void Editor::updateSyntax(Row* row)
-{
-	for (int i = 0; i < row->getSize(); i++) {
-		if (isdigit(row->getString()[i])) {
-			row->hl[i] = HL_NUMBER;
-		}
-	}
 }
