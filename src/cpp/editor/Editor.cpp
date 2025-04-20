@@ -4,7 +4,7 @@
 #include <iostream>
 
 Editor::Editor() :
-highlighter("resources/syntax/knight.json")
+highlighter("../resources/syntax/knight.json")
 {
 	terminal.enableRawMode();
 
@@ -51,6 +51,11 @@ void Editor::addRow(int index, std::string str)
 	} else {
 		rows.insert(rows.begin() + index, row);
 	}
+}
+
+void Editor::setPreferences(const Preferences* pref)
+{
+	preferences = pref;
 }
 
 int Editor::readKey()

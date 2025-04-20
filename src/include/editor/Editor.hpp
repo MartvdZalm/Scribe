@@ -15,6 +15,7 @@
 #include "editor/Row.hpp"
 #include "editor/Config.hpp"
 #include "editor/Highlighting.hpp"
+#include "editor/Preferences.hpp"
 
 #define SCRIBE_VERSION "0.0.1"
 #define SCRIBE_TAB_STOP 4
@@ -25,22 +26,14 @@
 class Editor
 {
 public:	
-	Config config;
-	Terminal terminal;
-	Exceptions exception;
-	SyntaxHighlighter highlighter;
-
-	int dirty = 0;
-	std::string filename = "[No Name]";
-	std::string statusMessage = "\0";
-	time_t statusMessageTime = 0;
-	std::vector<Row> rows;
-
 	Editor();
 	~Editor();
 
 	void open(const std::string& filename);
 	void addRow(int index, std::string str);
+	void setPreferences(const Preferences* pref);
+
+
 	int readKey();
 	void refreshScreen();
 	void scroll();
@@ -57,10 +50,22 @@ public:
 	void processKeypress();
 	void save();
 	void setStatusMessage(std::string message);
-	void updateSyntax(Row* row);
-	int syntaxToColor(int hl);
 
 	std::string prompt(std::string prompt, void (*callback)(std::vector<Row> rows, Config& config, std::string, int));
+
+private:
+	Config config;
+	Terminal terminal;
+	Exceptions exception;
+	SyntaxHighlighter highlighter;
+	const Preferences* preferences;
+
+	int dirty = 0;
+	std::string filename = "[No Name]";
+	std::string statusMessage = "\0";
+	time_t statusMessageTime = 0;
+	std::vector<Row> rows;
+
 };
 
 #endif
