@@ -14,6 +14,7 @@
 #include "editor/keybindings/Key.hpp"
 #include "editor/Row.hpp"
 #include "editor/Config.hpp"
+#include "editor/Highlighting.hpp"
 
 #define SCRIBE_VERSION "0.0.1"
 #define SCRIBE_TAB_STOP 4
@@ -44,6 +45,7 @@ public:
 	void refreshScreen();
 	void scroll();
 	void drawRows(std::string *ab);
+	void applyHighlighting(Row* row, HighlightTheme theme, std::string* ab);
 	void drawStatusBar(std::string *ab);
 	void drawMessageBar(std::string *ab);
 	void moveCursor(int key);

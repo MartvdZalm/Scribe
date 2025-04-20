@@ -1,5 +1,6 @@
 #include "editor/Editor.hpp"
 
+#include "editor/Highlighting.hpp"
 #include <iostream>
 
 Editor::Editor() :
@@ -204,37 +205,40 @@ void Editor::drawRows(std::string *ab)
             }
 
             Row* row = &rows.at(fileRow);
-
             highlighter.highlight(*row);
-
-            std::string str = row->getString();
-
-            for (int j = 0; j < len; j++) {
-                unsigned char hl = row->hl[j];
-                if (hl == HL_COMMENT) {
-                    ab->append("\x1b[32m");
-                } else if (hl == HL_STRING) {
-                    ab->append("\x1b[34m");
-                } else if (hl == HL_NUMBER) {
-                    ab->append("\x1b[31m");
-                } else if (hl == HL_KEYWORD) {
-                    ab->append("\x1b[36m");
-                } else if (hl == HL_TYPE) {
-                    ab->append("\x1b[33m");
-                } else if (hl == HL_LITERAL) {
-                    ab->append("\x1b[35m");
-                } else {
-                    ab->append("\x1b[0m");
-                }
-
-                ab->append(1, str[j]);
-                ab->append("\x1b[0m");
-            }
+            applyHighlighting(row, defaultTheme, ab);
 		}
 
 		ab->append("\x1b[K");
 		ab->append("\r\n");
 	}
+}
+
+void Editor::applyHighlighting(Row* row, HighlightTheme theme, std::string* ab)
+{
+    int len = row->getSize();
+    for (int j = 0; j < len; j++) {
+        unsigned char hl = row->hl[j];
+
+        if (hl == HL_COMMENT) {
+            ab->append(theme.comment);
+        } else if (hl == HL_STRING) {
+            ab->append(theme.string);
+        } else if (hl == HL_NUMBER) {
+            ab->append(theme.number);
+        } else if (hl == HL_KEYWORD) {
+            ab->append(theme.keyword);
+        } else if (hl == HL_TYPE) {
+            ab->append(theme.type);
+        } else if (hl == HL_LITERAL) {
+            ab->append(theme.literal);
+        } else {
+            ab->append(theme.reset);
+        }
+
+        ab->append(1, row->str[j]);
+        ab->append(theme.reset);
+    }	
 }
 
 void Editor::drawStatusBar(std::string *ab)
