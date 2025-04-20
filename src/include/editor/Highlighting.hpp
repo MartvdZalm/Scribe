@@ -3,7 +3,8 @@
 
 #include <string>
 
-struct HighlightTheme {
+struct HighlightTheme
+{
     std::string comment;
     std::string string;
     std::string number;
@@ -13,7 +14,8 @@ struct HighlightTheme {
     std::string reset;
 };
 
-inline HighlightTheme defaultTheme = {
+inline HighlightTheme defaultTheme =
+{
     "\x1b[32m",  // comment (green)
     "\x1b[34m",  // string (blue)
     "\x1b[31m",  // number (red)

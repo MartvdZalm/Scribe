@@ -1,4 +1,4 @@
-#include "Highlighting.hpp"
+#include "editor/Highlighting.hpp"
 #include <fstream>
 #include <nlohmann/json.hpp>
 

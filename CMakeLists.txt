@@ -6,4 +6,4 @@ file(COPY ${CMAKE_SOURCE_DIR}/resources/syntax DESTINATION ${CMAKE_BINARY_DIR}/r
 
 include_directories(${CMAKE_SOURCE_DIR}/lib/)
 
-add_subdirectory(src/main)
+add_subdirectory(src)

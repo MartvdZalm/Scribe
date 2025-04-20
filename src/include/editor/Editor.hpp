@@ -30,16 +30,16 @@ public:
 	Exceptions exception;
 	SyntaxHighlighter highlighter;
 
-	int dirty;
-	std::string filename;
-	std::string statusMessage;
-	time_t statusMessageTime;
+	int dirty = 0;
+	std::string filename = "[No Name]";
+	std::string statusMessage = "\0";
+	time_t statusMessageTime = 0;
 	std::vector<Row> rows;
 
 	Editor();
 	~Editor();
 
-	void open(char *filename);
+	void open(const std::string& filename);
 	void addRow(int index, std::string str);
 	int readKey();
 	void refreshScreen();

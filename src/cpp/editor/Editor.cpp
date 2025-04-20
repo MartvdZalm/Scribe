@@ -4,15 +4,7 @@
 #include <iostream>
 
 Editor::Editor() :
-config(),
-terminal(),
-exception(),
-dirty(0),
-filename("[No Name]"),
-statusMessage("\0"),
-statusMessageTime(0),
-highlighter("resources/syntax/knight.json"),
-rows()
+highlighter("resources/syntax/knight.json")
 {
 	terminal.enableRawMode();
 
@@ -27,9 +19,10 @@ rows()
 
 Editor::~Editor() {}
 
-void Editor::open(char *filename)
+void Editor::open(const std::string& filename)
 {
 	this->filename = filename;
+
 	std::ifstream file(filename);
 
 	if (!file.is_open()) {
@@ -38,11 +31,6 @@ void Editor::open(char *filename)
 
     std::string line;
     while (std::getline(file, line)) {
-
-    	line.erase(std::find_if(line.rbegin(), line.rend(), [](int ch) {
-        	return !std::isspace(ch);
-    	}).base(), line.end());
-
     	addRow(rows.size(), line);
     }
 
