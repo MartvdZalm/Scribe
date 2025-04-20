@@ -1,9 +1,12 @@
 #include "editor/Row.hpp"
 
 Row::Row() :
-str("") {}
+str(""),
+hl(nullptr) {}
 
-Row::~Row() {}
+Row::~Row() {
+    if (hl) delete[] hl;
+}
 
 int Row::getSize()
 {
@@ -15,9 +18,10 @@ std::string& Row::getString()
 	return str;
 }
 
-void Row::setString(std::string str)
+void Row::setString(const std::string& s)
 {
-	this->str = str;
+	str = s;
+    hl = new unsigned char[str.size()];
 }
 
 void Row::insertChar(int i, char c)

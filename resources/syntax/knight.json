@@ -1,10 +1,18 @@
 {
-  "keywords": ["func", "if", "else", "return", "var"],
-  "types": ["int", "float", "string"],
+  "language": "Knight",
+  "extensions": [".kn", ".knight"],
+  "keywords": ["func", "if", "else", "ret"],
+  "types": ["int", "float", "string", "bool"],
+  "literals": ["true", "false", "null"],
   "comments": {
-    "line_comment": "//",
-    "block_comment_start": "/*",
-    "block_comment_end": "*/"
+    "line": "//",
+    "block": {
+      "start": "/*",
+      "end": "*/"
+    }
   },
-  "strings": ["\"", "'"]
+  "strings": ["\"", "'"],
+  "numbers": {
+    "regex": "\\b[0-9]+\\b"
+  }
 }

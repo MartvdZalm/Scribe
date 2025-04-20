@@ -10,6 +10,7 @@
 
 #include "editor/terminal/Terminal.hpp"
 #include "editor/exceptions/Exceptions.hpp"
+#include "editor/SyntaxHighlighter.hpp"
 #include "editor/keybindings/Key.hpp"
 #include "editor/Row.hpp"
 #include "editor/Config.hpp"
@@ -26,7 +27,7 @@ public:
 	Config config;
 	Terminal terminal;
 	Exceptions exception;
-	// Highlighting highlighting;
+	SyntaxHighlighter highlighter;
 
 	int dirty;
 	std::string filename;

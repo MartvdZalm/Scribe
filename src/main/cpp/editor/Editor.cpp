@@ -1,4 +1,5 @@
 #include "editor/Editor.hpp"
+
 #include <iostream>
 
 Editor::Editor() :
@@ -9,6 +10,7 @@ dirty(0),
 filename("[No Name]"),
 statusMessage("\0"),
 statusMessageTime(0),
+highlighter("resources/syntax/knight.json"),
 rows()
 {
 	terminal.enableRawMode();
@@ -26,10 +28,7 @@ Editor::~Editor() {}
 
 void Editor::open(char *filename)
 {
-	std::cout << filename << std::endl;
-
 	this->filename = filename;
-
 	std::ifstream file(filename);
 
 	if (!file.is_open()) {
@@ -196,20 +195,41 @@ void Editor::drawRows(std::string *ab)
 		} else {
 			int len = rows.at(fileRow).getSize() - config.colOff;
 
-			if (len < 0) {
-				len = 0;
-			}
+            if (len < 0) {
+                len = 0;
+            }
 
-			if (len > config.screenCols) {
-				len = config.screenCols;
-			}
+            if (len > config.screenCols) {
+                len = config.screenCols;
+            }
 
-			Row* row = &rows.at(fileRow);
-			std::string str = row->getString();
+            Row* row = &rows.at(fileRow);
 
-			for (int j = 0; j < len; j++) {
-				ab->append(1, str[j]);
-			}
+            highlighter.highlight(*row);
+
+            std::string str = row->getString();
+
+            for (int j = 0; j < len; j++) {
+                unsigned char hl = row->hl[j];
+                if (hl == HL_COMMENT) {
+                    ab->append("\x1b[32m");
+                } else if (hl == HL_STRING) {
+                    ab->append("\x1b[34m");
+                } else if (hl == HL_NUMBER) {
+                    ab->append("\x1b[31m");
+                } else if (hl == HL_KEYWORD) {
+                    ab->append("\x1b[36m");
+                } else if (hl == HL_TYPE) {
+                    ab->append("\x1b[33m");
+                } else if (hl == HL_LITERAL) {
+                    ab->append("\x1b[35m");
+                } else {
+                    ab->append("\x1b[0m");
+                }
+
+                ab->append(1, str[j]);
+                ab->append("\x1b[0m");
+            }
 		}
 
 		ab->append("\x1b[K");

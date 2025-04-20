@@ -17,7 +17,7 @@ public:
 
 	std::string& getString();
 
-	void setString(std::string str);
+	void setString(const std::string& s);
 
 	void insertChar(int i, char c);
 

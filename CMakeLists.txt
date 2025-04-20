@@ -4,6 +4,6 @@ project(Scribe)
 
 file(COPY ${CMAKE_SOURCE_DIR}/resources/syntax DESTINATION ${CMAKE_BINARY_DIR}/resources)
 
-include_directories(${CMAKE_SOURCE_DIR}/lib/rapidjson/include)
+include_directories(${CMAKE_SOURCE_DIR}/lib/)
 
 add_subdirectory(src/main)
