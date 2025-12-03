@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 #include <regex>
-#include "editor/Row.hpp"
+#include "Row.hpp"
 
 enum HighlightType
 {

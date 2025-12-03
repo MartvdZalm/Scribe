@@ -1,4 +1,4 @@
-#include "editor/Config.hpp"
+#include "Config.hpp"
 
 Config::Config() : 
 x(0), 

@@ -1,4 +1,4 @@
-#include "editor/SyntaxHighlighter.hpp"
+#include "SyntaxHighlighter.hpp"
 #include <fstream>
 #include <sstream>
 #include <iostream>

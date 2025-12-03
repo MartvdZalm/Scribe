@@ -1,4 +1,4 @@
-#include "editor/exceptions/Exceptions.hpp"
+#include "Exceptions.hpp"
 
 Exceptions::Exceptions() {}
 Exceptions::~Exceptions() {}
