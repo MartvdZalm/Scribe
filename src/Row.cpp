@@ -1,11 +1,11 @@
 #include "Row.hpp"
 
-Row::Row() :
-str(""),
-hl(nullptr) {}
+Row::Row() : str(""), hl(nullptr) {}
 
-Row::~Row() {
-    if (hl) delete[] hl;
+Row::~Row()
+{
+    if (hl)
+        delete[] hl;
 }
 
 int Row::getSize()
@@ -15,29 +15,35 @@ int Row::getSize()
 
 std::string& Row::getString()
 {
-	return str;
+    return str;
 }
 
 void Row::setString(const std::string& s)
 {
-	str = s;
+    str = s;
     hl = new unsigned char[str.size()];
 }
 
 void Row::insertChar(int i, char c)
 {
-    if (str.length() == 0) {
+    if (str.length() == 0)
+    {
         str.push_back(c);
-    } else {
+    }
+    else
+    {
         str.insert(i, 1, c);
     }
 }
 
 void Row::insertString(int i, std::string input)
 {
-    if (str.length() == 0) {
+    if (str.length() == 0)
+    {
         str.append(input);
-    } else {
+    }
+    else
+    {
         str.insert(str.begin() + i, input.begin(), input.end());
     }
 }

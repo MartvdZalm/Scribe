@@ -5,23 +5,23 @@
 
 class Row
 {
-public:
-	std::string str;
-	unsigned char* hl;
+  public:
+    std::string str;
+    unsigned char* hl;
 
-	Row();
+    Row();
 
-	~Row();
+    ~Row();
 
-	int getSize();
+    int getSize();
 
-	std::string& getString();
+    std::string& getString();
 
-	void setString(const std::string& s);
+    void setString(const std::string& s);
 
-	void insertChar(int i, char c);
+    void insertChar(int i, char c);
 
-	void insertString(int i, std::string input);
+    void insertString(int i, std::string input);
 };
 
 #endif

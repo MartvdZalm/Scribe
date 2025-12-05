@@ -1,27 +1,51 @@
 #include "Highlighting.hpp"
+#include "Logger.hpp"
+#include "UserConfig.hpp"
 #include <fstream>
 #include <nlohmann/json.hpp>
 #include <stdexcept>
-#include "UserConfig.hpp"
+#include <unistd.h>
 
-HighlightTheme loadTheme(const std::string &filename) {
-  std::ifstream file(UserConfig::get().getPath(filename).string());
+HighlightTheme loadTheme(const std::string& filename)
+{
+    auto fullPath = UserConfig::get().getPath(filename).string();
+    LOG_DEBUG("Loading theme from: " + fullPath);
+    std::ifstream file(fullPath);
 
-  if (!file.is_open()) {
-    throw std::runtime_error("Could not open theme file: " + filename);
-  }
+    if (!file.is_open())
+    {
+        throw std::runtime_error("Could not open theme file: " + filename);
+    }
 
-  nlohmann::json j;
-  file >> j;
+    nlohmann::json j;
 
-  HighlightTheme theme;
-  theme.comment = j["comment"];
-  theme.string = j["string"];
-  theme.number = j["number"];
-  theme.keyword = j["keyword"];
-  theme.type = j["type"];
-  theme.literal = j["literal"];
-  theme.reset = j["reset"];
+    try
+    {
+        file >> j;
+    }
+    catch (const std::exception& e)
+    {
+        LOG_ERROR(std::string("JSON parse error: ") + e.what());
+        throw;
+    }
 
-  return theme;
+    HighlightTheme theme;
+
+    try
+    {
+        theme.comment = j.at("comment");
+        theme.string = j.at("string");
+        theme.number = j.at("number");
+        theme.keyword = j.at("keyword");
+        theme.type = j.at("type");
+        theme.literal = j.at("literal");
+        theme.reset = j.at("reset");
+    }
+    catch (const std::exception& e)
+    {
+        LOG_ERROR(std::string("Missing JSON key: ") + e.what());
+        throw;
+    }
+
+    return theme;
 }

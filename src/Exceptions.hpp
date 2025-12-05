@@ -1,17 +1,17 @@
 #ifndef EXCEPTIONS_H
 #define EXCEPTIONS_H
 
-#include <unistd.h>
 #include <cstdio>
 #include <cstdlib>
+#include <unistd.h>
 
 class Exceptions
 {
-public:
-	Exceptions();
-	~Exceptions();
+  public:
+    Exceptions();
+    ~Exceptions();
 
-	void die(const char *s);
+    void die(const char* s);
 };
 
 #endif

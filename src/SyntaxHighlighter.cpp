@@ -1,9 +1,9 @@
 #include "SyntaxHighlighter.hpp"
 #include <fstream>
-#include <sstream>
 #include <iostream>
-#include <regex>
 #include <nlohmann/json.hpp>
+#include <regex>
+#include <sstream>
 
 SyntaxHighlighter::SyntaxHighlighter(const std::string& languageFilePath)
 {
@@ -20,8 +20,10 @@ SyntaxHighlighter::SyntaxHighlighter(const std::string& languageFilePath)
     types = j["types"].get<std::vector<std::string>>();
     literals = j["literals"].get<std::vector<std::string>>();
 
-    for (const auto& s : j["strings"]) {
-        if (!s.empty()) {
+    for (const auto& s : j["strings"])
+    {
+        if (!s.empty())
+        {
             strings.push_back(s.get<std::string>()[0]);
         }
     }
@@ -79,7 +81,8 @@ void SyntaxHighlighter::highlight(Row& row)
         searchStart = match.suffix().first;
     }
 
-    auto highlightWords = [&](const std::vector<std::string>& words, unsigned char color) {
+    auto highlightWords = [&](const std::vector<std::string>& words, unsigned char color)
+    {
         for (const auto& word : words)
         {
             size_t pos = text.find(word);
@@ -99,5 +102,3 @@ void SyntaxHighlighter::highlight(Row& row)
     highlightWords(types, HL_TYPE);
     highlightWords(literals, HL_LITERAL);
 }
-
-

@@ -1,10 +1,10 @@
 #ifndef SYNTAX_HIGHLIGHTER_HPP
 #define SYNTAX_HIGHLIGHTER_HPP
 
+#include "Row.hpp"
+#include <regex>
 #include <string>
 #include <vector>
-#include <regex>
-#include "Row.hpp"
 
 enum HighlightType
 {
@@ -19,12 +19,12 @@ enum HighlightType
 
 class SyntaxHighlighter
 {
-public:
+  public:
     SyntaxHighlighter(const std::string& languageFilePath);
 
     void highlight(Row& row);
 
-private:
+  private:
     std::vector<std::string> keywords;
     std::vector<std::string> types;
     std::vector<std::string> literals;

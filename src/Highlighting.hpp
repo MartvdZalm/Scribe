@@ -14,15 +14,14 @@ struct HighlightTheme
     std::string reset;
 };
 
-inline HighlightTheme defaultTheme =
-{
-    "\x1b[32m",  // comment (green)
-    "\x1b[34m",  // string (blue)
-    "\x1b[31m",  // number (red)
-    "\x1b[36m",  // keyword (cyan)
-    "\x1b[33m",  // type (yellow)
-    "\x1b[35m",  // literal (magenta)
-    "\x1b[0m"    // reset
+inline HighlightTheme defaultTheme = {
+    "\x1b[32m", // comment (green)
+    "\x1b[34m", // string (blue)
+    "\x1b[31m", // number (red)
+    "\x1b[36m", // keyword (cyan)
+    "\x1b[33m", // type (yellow)
+    "\x1b[35m", // literal (magenta)
+    "\x1b[0m"   // reset
 };
 
 HighlightTheme loadTheme(const std::string& filename);

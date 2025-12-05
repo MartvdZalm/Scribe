@@ -5,7 +5,7 @@
 
 class Logger
 {
-public:
+  public:
     enum class Level
     {
         Debug,
@@ -16,9 +16,7 @@ public:
     };
 
     static void initialize(const std::string& appName);
-    static void log(Level level, const std::string& message,
-                    const char* file = nullptr,
-                    const char* function = nullptr,
+    static void log(Level level, const std::string& message, const char* file = nullptr, const char* function = nullptr,
                     int line = -1);
 
 #define LOG_DEBUG(msg) Logger::log(Logger::Level::Debug, msg, __FILE__, __func__, __LINE__)
@@ -27,10 +25,10 @@ public:
 #define LOG_ERROR(msg) Logger::log(Logger::Level::Error, msg, __FILE__, __func__, __LINE__)
 #define LOG_CRITICAL(msg) Logger::log(Logger::Level::Critical, msg, __FILE__, __func__, __LINE__)
 
-private:
+  private:
     static std::string logFilePath;
-    static std::string formatMessage(Level level, const std::string& message,
-                                     const char* file, const char* function, int line);
+    static std::string formatMessage(Level level, const std::string& message, const char* file, const char* function,
+                                     int line);
 
     static std::string currentDateTime();
     static std::string extractFilename(const std::string& path);

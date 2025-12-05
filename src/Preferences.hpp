@@ -3,11 +3,12 @@
 
 #include <string>
 
-struct Preferences {
-  bool word_wrap;
-  std::string theme;
+struct Preferences
+{
+    bool word_wrap;
+    std::string theme;
 };
 
-Preferences loadPreferences(const std::string &filename);
+Preferences loadPreferences(const std::string& filename);
 
 #endif
