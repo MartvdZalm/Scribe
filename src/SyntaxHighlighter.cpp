@@ -37,15 +37,14 @@ SyntaxHighlighter::SyntaxHighlighter(const std::string& languageFilePath)
 
 void SyntaxHighlighter::highlight(Row& row)
 {
-    row.hl = new unsigned char[row.str.size()];
-    std::fill(row.hl, row.hl + row.str.size(), HL_NORMAL);
+    row.hl.assign(row.str.size(), HL_NORMAL);
 
     std::string& text = row.str;
 
     size_t commentPos = text.find(lineComment);
     if (commentPos != std::string::npos)
     {
-        std::fill(row.hl + commentPos, row.hl + text.size(), HL_COMMENT);
+        std::fill(row.hl.begin() + commentPos, row.hl.end(), HL_COMMENT);
         return;
     }
 
@@ -59,7 +58,7 @@ void SyntaxHighlighter::highlight(Row& row)
             {
                 if (inString)
                 {
-                    std::fill(row.hl + start, row.hl + i + 1, HL_STRING);
+                    std::fill(row.hl.begin() + start, row.hl.begin() + i + 1, HL_STRING);
                     inString = false;
                 }
                 else
@@ -77,7 +76,7 @@ void SyntaxHighlighter::highlight(Row& row)
     {
         size_t start = match.position();
         size_t length = match.length();
-        std::fill(row.hl + start, row.hl + start + length, HL_NUMBER);
+        std::fill(row.hl.begin() + start, row.hl.begin() + start + length, HL_NUMBER);
         searchStart = match.suffix().first;
     }
 
@@ -91,7 +90,7 @@ void SyntaxHighlighter::highlight(Row& row)
                 if ((pos == 0 || !isalnum(text[pos - 1])) &&
                     (pos + word.length() == text.size() || !isalnum(text[pos + word.length()])))
                 {
-                    std::fill(row.hl + pos, row.hl + pos + word.length(), color);
+                    std::fill(row.hl.begin() + pos, row.hl.begin() + pos + word.length(), color);
                 }
                 pos = text.find(word, pos + word.length());
             }

@@ -2,26 +2,24 @@
 #define ROW_H
 
 #include <string>
+#include <vector>
 
 class Row
 {
   public:
-    std::string str;
-    unsigned char* hl;
-
     Row();
+    ~Row() = default;
 
-    ~Row();
-
-    int getSize();
-
+    int getSize() const;
     std::string& getString();
+    const std::string& getString() const;
 
     void setString(const std::string& s);
-
     void insertChar(int i, char c);
+    void insertString(int i, const std::string& input);
 
-    void insertString(int i, std::string input);
+    std::string str;
+    std::vector<unsigned char> hl;
 };
 
 #endif

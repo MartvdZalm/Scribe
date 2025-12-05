@@ -27,7 +27,6 @@ class Editor
 {
   public:
     Editor();
-    ~Editor();
 
     void open(const std::string& filename);
     void addRow(int index, std::string str);
@@ -37,7 +36,7 @@ class Editor
     void refreshScreen();
     void scroll();
     void drawRows(std::string* ab);
-    void applyHighlighting(Row* row, HighlightTheme theme, std::string* ab);
+    void applyHighlighting(Row* row, HighlightTheme theme, std::string* ab, int length);
     void drawStatusBar(std::string* ab);
     void drawMessageBar(std::string* ab);
     void moveCursor(int key);
@@ -50,7 +49,8 @@ class Editor
     void save();
     void setStatusMessage(std::string message);
 
-    std::string prompt(std::string prompt, void (*callback)(std::vector<Row> rows, Config& config, std::string, int));
+    std::string prompt(std::string promptText,
+                       void (*callback)(std::vector<Row>&, Config& config, const std::string&, int));
 
   private:
     Config config;

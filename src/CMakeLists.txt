@@ -1,5 +1,5 @@
 file(GLOB SRC_FILES "*.cpp")
-list(REMOVE_ITEM SRC_FILES "${CMAKE_CURRENT_SOURCE_DIR}/Main.cpp")
+list(REMOVE_ITEM SRC_FILES "${CMAKE_CURRENT_SOURCE_DIR}/main.cpp")
 
 add_library(editor_library ${SRC_FILES})
 

@@ -3,7 +3,10 @@
 #include "Highlighting.hpp"
 #include "Logger.hpp"
 #include "UserConfig.hpp"
+#include <cerrno>
+#include <cstring>
 #include <iostream>
+#include <unistd.h>
 
 Editor::Editor() : highlighter(UserConfig::get().getPath("syntax/knight.json").string()), currentTheme(defaultTheme)
 {
@@ -19,8 +22,6 @@ Editor::Editor() : highlighter(UserConfig::get().getPath("syntax/knight.json").s
     statusMessageTime = time(nullptr);
 }
 
-Editor::~Editor() {}
-
 void Editor::open(const std::string& filename)
 {
     this->filename = filename;
@@ -29,21 +30,34 @@ void Editor::open(const std::string& filename)
 
     if (!file.is_open())
     {
-        throw std::runtime_error("Failed to open file");
+        throw std::runtime_error("Failed to open file: " + filename + " - " + std::string(std::strerror(errno)));
     }
 
     std::string line;
     while (std::getline(file, line))
     {
         addRow(rows.size(), line);
+        // addRow(static_cast<int>(rows.size()), line);
+    }
+
+    if (file.bad())
+    {
+        file.close();
+        throw std::runtime_error("Error reading file: " + filename + " - " + std::string(std::strerror(errno)));
     }
 
     file.close();
+
+    // Ensure at least one empty row exists
+    if (rows.empty())
+    {
+        addRow(0, "");
+    }
 }
 
 void Editor::addRow(int index, std::string str)
 {
-    if (index < 0 || index > rows.size())
+    if (index < 0 || index > static_cast<int>(rows.size()))
     {
         return;
     }
@@ -51,7 +65,7 @@ void Editor::addRow(int index, std::string str)
     Row row;
     row.setString(str);
 
-    if (index == rows.size())
+    if (index == static_cast<int>(rows.size()))
     {
         rows.push_back(row);
     }
@@ -228,13 +242,11 @@ void Editor::drawRows(std::string* ab)
 {
     for (int i = 0; i < config.screenRows; i++)
     {
-
         int fileRow = i + config.rowOff;
 
-        if (fileRow >= rows.size())
+        if (fileRow >= static_cast<int>(rows.size()))
         {
-
-            if (rows.size() == 0 && i == config.screenRows / 3)
+            if (rows.empty() && i == config.screenRows / 3)
             {
                 std::string greeting = "Scribe Editor -- version " + std::string(SCRIBE_VERSION);
 
@@ -259,21 +271,28 @@ void Editor::drawRows(std::string* ab)
         }
         else
         {
-            int len = rows.at(fileRow).getSize() - config.colOff;
-
-            if (len < 0)
+            if (fileRow < 0 || fileRow >= static_cast<int>(rows.size()))
             {
-                len = 0;
+                ab->append("~");
             }
-
-            if (len > config.screenCols)
+            else
             {
-                len = config.screenCols;
-            }
+                int len = rows[fileRow].getSize() - config.colOff;
 
-            Row* row = &rows.at(fileRow);
-            highlighter.highlight(*row);
-            applyHighlighting(row, currentTheme, ab);
+                if (len < 0)
+                {
+                    len = 0;
+                }
+
+                if (len > config.screenCols)
+                {
+                    len = config.screenCols;
+                }
+
+                Row* row = &rows[fileRow];
+                highlighter.highlight(*row);
+                applyHighlighting(row, currentTheme, ab, len);
+            }
         }
 
         ab->append("\x1b[K");
@@ -281,41 +300,32 @@ void Editor::drawRows(std::string* ab)
     }
 }
 
-void Editor::applyHighlighting(Row* row, HighlightTheme theme, std::string* ab)
+void Editor::applyHighlighting(Row* row, HighlightTheme theme, std::string* ab, int length)
 {
-    int len = row->getSize();
-    for (int j = 0; j < len; j++)
+    if (!row || row->hl.empty())
+        return;
+
+    int rowLen = row->getSize();
+    int end = std::min(config.colOff + length, rowLen);
+
+    for (int j = config.colOff; j < end; j++)
     {
         unsigned char hl = row->hl[j];
 
         if (hl == HL_COMMENT)
-        {
             ab->append(theme.comment);
-        }
         else if (hl == HL_STRING)
-        {
             ab->append(theme.string);
-        }
         else if (hl == HL_NUMBER)
-        {
             ab->append(theme.number);
-        }
         else if (hl == HL_KEYWORD)
-        {
             ab->append(theme.keyword);
-        }
         else if (hl == HL_TYPE)
-        {
             ab->append(theme.type);
-        }
         else if (hl == HL_LITERAL)
-        {
             ab->append(theme.literal);
-        }
         else
-        {
             ab->append(theme.reset);
-        }
 
         ab->append(1, row->str[j]);
         ab->append(theme.reset);
@@ -326,8 +336,9 @@ void Editor::drawStatusBar(std::string* ab)
 {
     ab->append("\x1b[7m");
 
+    std::string filenameDisplay = (filename.length() > 20) ? filename.substr(0, 20) : filename;
     std::string status =
-        filename.substr(0, 20) + " - " + std::to_string(rows.size()) + " lines " + (dirty ? "(modified)" : "");
+        filenameDisplay + " - " + std::to_string(rows.size()) + " lines " + (dirty ? "(modified)" : "");
 
     ab->append(status);
 
@@ -359,7 +370,7 @@ void Editor::drawMessageBar(std::string* ab)
 
 void Editor::moveCursor(int key)
 {
-    Row* row = (config.y >= rows.size()) ? nullptr : &rows.at(config.y);
+    Row* row = (config.y >= static_cast<int>(rows.size()) || config.y < 0) ? nullptr : &rows[config.y];
 
     switch (key)
     {
@@ -373,7 +384,14 @@ void Editor::moveCursor(int key)
         else if (config.y > 0)
         {
             config.y--;
-            config.x = rows.at(config.y).getSize();
+            if (config.y < static_cast<int>(rows.size()))
+            {
+                config.x = rows[config.y].getSize();
+            }
+            else
+            {
+                config.x = 0;
+            }
         }
     }
     break;
@@ -403,7 +421,7 @@ void Editor::moveCursor(int key)
 
     case ARROW_DOWN:
     {
-        if (config.y < rows.size())
+        if (config.y < static_cast<int>(rows.size()))
         {
             config.y++;
         }
@@ -411,7 +429,7 @@ void Editor::moveCursor(int key)
     break;
     }
 
-    row = (config.y >= rows.size()) ? nullptr : &rows.at(config.y);
+    row = (config.y >= static_cast<int>(rows.size()) || config.y < 0) ? nullptr : &rows[config.y];
     int rowLen = row ? row->getSize() : 0;
 
     if (config.x > rowLen)
@@ -422,12 +440,17 @@ void Editor::moveCursor(int key)
 
 void Editor::insertChar(int c)
 {
-    if (config.y == rows.size())
+    if (config.y == static_cast<int>(rows.size()))
     {
-        addRow(rows.size(), "");
+        addRow(static_cast<int>(rows.size()), "");
     }
 
-    Row& row = rows.at(config.y);
+    if (config.y < 0 || config.y >= static_cast<int>(rows.size()))
+    {
+        return;
+    }
+
+    Row& row = rows[config.y];
     int index = config.x;
 
     if (index < 0 || index > row.getSize())
@@ -442,26 +465,36 @@ void Editor::insertChar(int c)
 
 void Editor::insertNewline()
 {
+    if (config.y < 0 || config.y >= static_cast<int>(rows.size()))
+    {
+        // Add empty row at the end
+        addRow(static_cast<int>(rows.size()), "");
+        config.y = static_cast<int>(rows.size()) - 1;
+        config.x = 0;
+        return;
+    }
+
     if (config.x == 0)
     {
         addRow(config.y, "");
     }
     else
     {
-        Row& row = rows.at(config.y);
+        Row& row = rows[config.y];
 
         std::string substring = row.getString().substr(config.x);
-        row.getString().erase(config.x);
+        row.getString().resize(config.x);
         addRow(config.y + 1, substring);
     }
 
     config.y++;
     config.x = 0;
+    dirty++;
 }
 
 void Editor::deleteChar()
 {
-    if (config.y == rows.size())
+    if (config.y < 0 || config.y >= static_cast<int>(rows.size()))
     {
         return;
     }
@@ -471,50 +504,58 @@ void Editor::deleteChar()
         return;
     }
 
-    Row& row = rows.at(config.y);
+    Row& row = rows[config.y];
 
     if (config.x > 0)
     {
         int index = config.x - 1;
 
-        if (index < 0 || index > row.getSize())
+        if (index < 0 || index >= row.getSize())
         {
             return;
         }
 
         row.getString().erase(index, 1);
         dirty++;
-
         config.x--;
     }
     else
     {
-        config.x = rows.at(config.y - 1).getSize();
-        deleteRow(config.y);
-
-        config.y--;
+        // Merge with previous row
+        if (config.y > 0)
+        {
+            config.x = rows[config.y - 1].getSize();
+            deleteRow(config.y);
+            config.y--;
+        }
     }
 }
 
 void Editor::deleteRow(int index)
 {
-    Row currentRow = rows.at(config.y);
-    if (index < 0 || index >= rows.size())
+    // Bounds check first before any access
+    if (index < 0 || index >= static_cast<int>(rows.size()))
     {
         return;
     }
 
-    if (currentRow.getSize() != 0)
+    // If not the first row, merge with previous row
+    if (index > 0)
     {
-        Row& row = rows.at(config.y - 1);
-        row.insertString(row.getSize(), currentRow.getString());
+        Row& prevRow = rows[index - 1];
+        Row& currentRow = rows[index];
+
+        if (currentRow.getSize() > 0)
+        {
+            prevRow.insertString(prevRow.getSize(), currentRow.getString());
+        }
     }
 
     rows.erase(rows.begin() + index);
     dirty++;
 }
 
-static void findCallback(std::vector<Row> rows, Config& config, std::string query, int key)
+static void findCallback(std::vector<Row>& rows, Config& config, const std::string& query, int key)
 {
     static int lastMatch = -1;
     static int direction = 1;
@@ -546,20 +587,25 @@ static void findCallback(std::vector<Row> rows, Config& config, std::string quer
 
     int current = lastMatch;
 
-    for (int i = 0; i < rows.size(); i++)
+    for (int i = 0; i < static_cast<int>(rows.size()); i++)
     {
         current += direction;
 
         if (current == -1)
         {
-            current = rows.size() - 1;
+            current = static_cast<int>(rows.size()) - 1;
         }
-        else if (current == rows.size())
+        else if (current == static_cast<int>(rows.size()))
         {
             current = 0;
         }
 
-        Row row = rows.at(current);
+        if (current < 0 || current >= static_cast<int>(rows.size()))
+        {
+            continue;
+        }
+
+        Row row = rows[current];
         std::string rowString = row.getString();
 
         size_t position = rowString.find(query);
@@ -568,20 +614,29 @@ static void findCallback(std::vector<Row> rows, Config& config, std::string quer
         {
             lastMatch = current;
             config.y = current;
-            config.x = position;
-            config.rowOff = rows.size();
+            config.x = static_cast<int>(position);
+            // Ensure the found row is visible on screen
+            if (config.y < config.rowOff)
+            {
+                config.rowOff = config.y;
+            }
+            else if (config.y >= config.rowOff + config.screenRows)
+            {
+                config.rowOff = config.y - config.screenRows + 1;
+            }
             break;
         }
     }
 }
 
-std::string Editor::prompt(std::string prompt, void (*callback)(std::vector<Row>, Config& config, std::string, int))
+std::string Editor::prompt(std::string promptText,
+                           void (*callback)(std::vector<Row>&, Config& config, const std::string&, int))
 {
     std::string input;
 
     while (1)
     {
-        statusMessage = prompt;
+        statusMessage = promptText + input;
         refreshScreen();
 
         int c = readKey();
@@ -591,7 +646,6 @@ std::string Editor::prompt(std::string prompt, void (*callback)(std::vector<Row>
             if (!input.empty())
             {
                 input.pop_back();
-                prompt.pop_back();
             }
         }
         else if (c == '\x1b')
@@ -606,21 +660,17 @@ std::string Editor::prompt(std::string prompt, void (*callback)(std::vector<Row>
         }
         else if (c == '\r')
         {
-            if (!input.empty())
-            {
-                statusMessage = "";
+            statusMessage = "";
 
-                if (callback)
-                {
-                    callback(rows, config, input, c);
-                }
-                return input;
+            if (callback)
+            {
+                callback(rows, config, input, c);
             }
+            return input;
         }
         else if (!iscntrl(c) && c < 128)
         {
-            input.push_back(c);
-            prompt.push_back(c);
+            input.push_back(static_cast<char>(c));
         }
 
         if (callback)
@@ -707,7 +757,14 @@ void Editor::processKeypress()
 
     case END_KEY:
     {
-        config.x = config.screenCols - 1;
+        if (config.y >= 0 && config.y < static_cast<int>(rows.size()))
+        {
+            config.x = rows[config.y].getSize();
+        }
+        else
+        {
+            config.x = 0;
+        }
     }
     break;
 
@@ -767,28 +824,67 @@ void Editor::save()
 {
     if (filename == "[No Name]")
     {
+        setStatusMessage("No filename specified. Use Ctrl-S and enter a filename first.");
         return;
     }
 
-    std::filesystem::path cwd = std::filesystem::current_path() / filename;
-    std::ofstream outputFile(cwd.string(), std::ios::binary);
+    std::filesystem::path filePath;
+
+    // Handle absolute paths
+    if (filename[0] == '/' || (filename.length() > 1 && filename[1] == ':'))
+    {
+        filePath = filename;
+    }
+    else
+    {
+        filePath = std::filesystem::current_path() / filename;
+    }
+
+    std::ofstream outputFile(filePath.string(), std::ios::binary);
 
     if (!outputFile.is_open())
     {
-        statusMessage = "Can't save! I/O error: " + std::string(std::strerror(errno));
+        setStatusMessage("Can't save! I/O error: " + std::string(std::strerror(errno)));
         return;
     }
 
     for (Row& row : this->rows)
     {
         outputFile << row.getString() << '\n';
+
+        if (outputFile.fail())
+        {
+            outputFile.close();
+            setStatusMessage("Error writing to file: " + std::string(std::strerror(errno)));
+            return;
+        }
     }
 
     outputFile.close();
 
-    std::uintmax_t fileSize = std::filesystem::file_size(cwd);
+    if (outputFile.fail())
+    {
+        setStatusMessage("Error closing file: " + std::string(std::strerror(errno)));
+        return;
+    }
 
-    setStatusMessage(std::to_string(fileSize) + " bytes written to disk");
+    // Get file size safely
+    try
+    {
+        if (std::filesystem::exists(filePath))
+        {
+            std::uintmax_t fileSize = std::filesystem::file_size(filePath);
+            setStatusMessage(std::to_string(fileSize) + " bytes written to disk");
+        }
+        else
+        {
+            setStatusMessage("File saved (size unknown)");
+        }
+    }
+    catch (const std::filesystem::filesystem_error& e)
+    {
+        setStatusMessage("File saved (could not determine size)");
+    }
 
     dirty = 0;
 }

@@ -13,7 +13,7 @@ include_directories(${CMAKE_SOURCE_DIR}/lib/)
 
 add_subdirectory(src)
 
-add_executable(scribe src/Main.cpp)
+add_executable(scribe src/main.cpp)
 
 target_link_libraries(scribe PRIVATE editor_library)
 
